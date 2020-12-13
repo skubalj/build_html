@@ -5,18 +5,6 @@
 use crate::Html;
 use crate::HtmlPage;
 
-/// Represents the HTML `<base>` element
-pub struct Base;
-
-/// Represents the HTML `<link>` element
-pub struct Link;
-
-/// Represents the HTML `<meta>` element
-pub struct Meta;
-
-/// Represents the HTML `<style>` element
-pub struct Style;
-
 /// Represents the HTML `<title>` element
 #[derive(PartialEq, PartialOrd, Debug)]
 pub struct Title {
