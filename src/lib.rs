@@ -127,6 +127,5 @@ mod tests {
                 "<!DOCTYPE html><html><head><title>Default Page</title></head><body></body></html>"
             )
         }
-
     }
 }

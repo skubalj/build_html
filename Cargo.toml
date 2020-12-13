@@ -1,5 +1,5 @@
 [package]
-name = "html-gen"
+name = "html_gen"
 version = "0.1.0"
 authors = ["Joseph Skubal"]
 edition = "2018"

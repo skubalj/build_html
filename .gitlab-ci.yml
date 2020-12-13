@@ -1,0 +1,28 @@
+stages:
+  - lint
+  - test
+
+default:
+  image: rust:latest
+  cache: 
+    key: cache-key
+    untracked: true
+    paths:
+    - target/
+
+clippy:
+  stage: lint
+  before_script:
+    - rustup component add clippy --toolchain 1.48.0-x86_64-unknown-linux-gnu
+  script: 
+    - cargo clippy -- -D warnings
+
+check:
+  stage: lint
+  script:
+    - cargo check
+
+test:
+  stage: test
+  script:
+    - cargo test

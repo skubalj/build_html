@@ -1,6 +1,6 @@
 //! This module contains structures used for HTML containers, which can contain other HTML elements
 
-use crate::content::{TextContent, TextContentType};
+use crate::content::TextContent;
 use crate::{Html, HtmlContainer};
 
 use std::fmt::{self, Debug, Display};
