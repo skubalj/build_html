@@ -66,11 +66,7 @@ impl Html for HtmlPage {
             .fold(String::new(), |acc, next| acc + &next);
 
         format!(
-            "<!DOCTYPE html>
-            <html>
-            <head>{}</head>
-            <body>{}</body>
-            </html>",
+            "<!DOCTYPE html><html><head>{}</head><body>{}</body></html>",
             head, body
         )
     }
@@ -90,9 +86,7 @@ impl HtmlContainer for HtmlPage {
 
 impl Default for HtmlPage {
     fn default() -> Self {
-        HtmlPage::new()
-            .add_title("Default Page")
-            .add_h(1, "Hello World")
+        HtmlPage::new().add_title("Default Page")
     }
 }
 
@@ -114,8 +108,25 @@ impl HtmlPage {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    use super::*;
+
+    mod html_page {
+        use super::*;
+
+        #[test]
+        fn default() {
+            // Arrange
+            let sut = HtmlPage::default();
+
+            // Act
+            let html_string = sut.to_html_string();
+
+            // Assert
+            assert_eq!(
+                html_string,
+                "<!DOCTYPE html><html><head><title>Default Page</title></head><body></body></html>"
+            )
+        }
+
     }
 }

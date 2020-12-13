@@ -14,7 +14,7 @@ pub enum TextContentType {
 impl Display for TextContentType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            TextContentType::Paragraph => write!(f, "f"),
+            TextContentType::Paragraph => write!(f, "p"),
             TextContentType::Header(n) => write!(f, "h{}", n),
             TextContentType::Preformatted => write!(f, "pre"),
         }
@@ -60,7 +60,7 @@ mod tests {
             let actual = TextContent::new(tag, content);
 
             // Assert
-            assert_eq!(actual, expected);
+            assert_eq!(actual.to_html_string(), expected);
         }
     }
 }
