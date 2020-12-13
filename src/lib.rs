@@ -6,15 +6,13 @@
 //! ```rust
 //! use html_gen::*;
 //!
-//! fn main() {
-//!     let html: String = HtmlPage::new()
-//!         .add_title("My Page")
-//!         .add_h(1, "Hello, World")
-//!         .add_p("This is a simple HTML demo")
-//!         .to_html_string();
+//! let html: String = HtmlPage::new()
+//!     .add_title("My Page")
+//!     .add_h(1, "Hello, World")
+//!     .add_p("This is a simple HTML demo")
+//!     .to_html_string();
 //!    
-//!     println!("{}", html);
-//! }
+//! println!("{}", html);
 //! ```
 //!
 //! produces a string equivalent to:
