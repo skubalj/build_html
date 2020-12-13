@@ -1,44 +1,50 @@
-use std::fmt::{self, Display};
-use std::marker::Sized;
+//! This library is designed to provide a simple way to generate HTML documents dynamically from
+//! within Rust code. To generate documents, this library uses the decorator pattern,
+//!
+//! # Example
+//!
+//! ```rust
+//! use html_gen::*;
+//!
+//! fn main() {
+//!     let html: String = HtmlPage::new()
+//!         .add_title("My Page")
+//!         .add_h(1, "Hello, World")
+//!         .add_p("This is a simple HTML demo")
+//!         .to_html_string();
+//!    
+//!     println!("{}", html);
+//! }
+//! ```
+//!
+//! produces a string equivalent to:
+//!
+//! ```html
+//! <!DOCTYPE html>
+//! <html>
+//!     <head>
+//!         <title>My Page</title>
+//!     </head>
+//!     <body>
+//!         <h1>Hello World</h1>
+//!         <p>This is a simple HTML demo</p>
+//!     </body>
+//! </html>
+//! ```
+//!
 
-use containers::Container;
+use std::fmt::{self, Display};
+
+pub use containers::HtmlContainer;
 use content::{TextContent, TextContentType};
 
 pub mod containers;
 mod content;
-mod metadata;
 
 /// An element that can be converted to HTML
 pub trait Html: fmt::Debug {
     /// Convert this element into an HTML string
     fn to_html_string(&self) -> String;
-}
-
-/// An HTML element that can contain other HTML elements
-pub trait HtmlContainer: Html + Sized {
-    /// Adds a header tag with the designated level to this container
-    fn add_h(self, level: u8, text: &str) -> Self {
-        let content = TextContent::new(TextContentType::Header(level), text);
-        self.add_text(content)
-    }
-
-    /// Nest the specified container within this container
-    fn add_container(self, container: Container) -> Self;
-
-    /// Adds a `<p>` tag element to this Container
-    fn add_p(self, text: &str) -> Self {
-        let content = TextContent::new(TextContentType::Paragraph, text);
-        self.add_text(content)
-    }
-
-    /// Adds a `<pre>` tag element to this container
-    fn add_pre(self, text: &str) -> Self {
-        let content = TextContent::new(TextContentType::Preformatted, text);
-        self.add_text(content)
-    }
-
-    /// Adds the specified text content element to this container
-    fn add_text(self, content: TextContent) -> Self;
 }
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
@@ -73,13 +79,8 @@ impl Html for HtmlPage {
 }
 
 impl HtmlContainer for HtmlPage {
-    fn add_container(mut self, container: Container) -> Self {
-        self.body.push(Box::new(container));
-        self
-    }
-
-    fn add_text(mut self, content: TextContent) -> Self {
-        self.body.push(Box::new(content));
+    fn add_html(mut self, html: Box<dyn Html>) -> Self {
+        self.body.push(html);
         self
     }
 }
@@ -103,6 +104,13 @@ impl HtmlPage {
             head: Vec::new(),
             body: Vec::new(),
         }
+    }
+
+    /// Adds a title to this HTML page
+    pub fn add_title(mut self, title_text: &str) -> Self {
+        let title = TextContent::new(TextContentType::Title, title_text);
+        self.head.push(Box::new(title));
+        self
     }
 }
 

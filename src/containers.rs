@@ -1,9 +1,50 @@
-//! This module contains structures used for HTML containers, which can contain other HTML elements
+//! This module contains structures used for HTML containers, which can contain other HTML
+//! elements. Containers are items such as lists, divs, and articles.
+//!
+//! Containers implement
 
-use crate::content::TextContent;
-use crate::{Html, HtmlContainer};
+use crate::content::{Link, TextContent, TextContentType};
+use crate::Html;
 
 use std::fmt::{self, Debug, Display};
+use std::marker::Sized;
+
+/// An HTML element that can contain other HTML elements
+///
+/// HTML containers include tags such as: `article`, `div`, `ol`, `ul`.
+pub trait HtmlContainer: Html + Sized {
+    /// Adds the specified HTML element to this container
+    fn add_html(self, html: Box<dyn Html>) -> Self;
+
+    /// Adds an `<a>` tag to this container
+    fn add_a(self, href: &str, text: &str) -> Self {
+        let content = Link::new(href, text);
+        self.add_html(Box::new(content))
+    }
+
+    /// Nest the specified container within this container
+    fn add_container(self, container: Container) -> Self {
+        self.add_html(Box::new(container))
+    }
+
+    /// Adds a header tag with the designated level to this container
+    fn add_h(self, level: u8, text: &str) -> Self {
+        let content = TextContent::new(TextContentType::Header(level), text);
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds a `<p>` tag element to this Container
+    fn add_p(self, text: &str) -> Self {
+        let content = TextContent::new(TextContentType::Paragraph, text);
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds a `<pre>` tag element to this container
+    fn add_pre(self, text: &str) -> Self {
+        let content = TextContent::new(TextContentType::Preformatted, text);
+        self.add_html(Box::new(content))
+    }
+}
 
 /// The different types of Html Containers that can be added to the page
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -61,13 +102,8 @@ impl Html for Container {
 }
 
 impl HtmlContainer for Container {
-    fn add_container(mut self, container: Container) -> Self {
-        self.elements.push(Box::new(container));
-        self
-    }
-
-    fn add_text(mut self, content: TextContent) -> Self {
-        self.elements.push(Box::new(content));
+    fn add_html(mut self, content: Box<dyn Html>) -> Self {
+        self.elements.push(content);
         self
     }
 }
@@ -79,11 +115,43 @@ impl Default for Container {
 }
 
 impl Container {
-    /// Creates a new list with the specified tag.
+    /// Creates a new container with the specified tag.
     pub fn new(tag: ContainerType) -> Self {
         Container {
             tag,
             elements: Vec::new(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod html_container {
+        use super::*;
+        use test_case::test_case;
+
+        #[test_case(Container::new(ContainerType::Div), "rust-lang.org", "rust", r#"<div><a href="rust-lang.org">rust</a></div>"#; "test_div")]
+        #[test_case(Container::new(ContainerType::OrderedList), "abc", "123", r#"<ol><li><a href="abc">123</a></li></ol>"#; "test_ordered_list")]
+        #[test_case(Container::new(ContainerType::UnorderedList), "abc", "123", r#"<ul><li><a href="abc">123</a></li></ul>"#; "test_unordered_list")]
+        fn test_add_a(container: Container, href: &str, text: &str, expected: &str) {
+            // Act
+            let actual = container.add_a(href, text).to_html_string();
+
+            // Assert
+            assert_eq!(actual, expected);
+        }
+
+        #[test_case(Container::new(ContainerType::Div), "hello world", "<div><p>hello world</p></div>"; "test_div")]
+        #[test_case(Container::new(ContainerType::OrderedList), "hello world", "<ol><li><p>hello world</p></li></ol>"; "test_ordered_list")]
+        #[test_case(Container::new(ContainerType::UnorderedList), "hello world", "<ul><li><p>hello world</p></li></ul>"; "test_unordered_list")]
+        fn test_add_p(container: Container, text: &str, expected: &str) {
+            // Act
+            let actual = container.add_p(text).to_html_string();
+
+            // Assert
+            assert_eq!(actual, expected);
         }
     }
 }

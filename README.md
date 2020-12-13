@@ -12,13 +12,14 @@ an `HttpPage`, and build up the document with chained method calls. Once the doc
 convert it to a `String` using `to_html_string()`. 
 
 ```rust
-use http_gen::HtmlPage;
+use http_gen::*;
 
 fn main() {
-    let html: String = HttpPage
+    let html: String = HtmlPage::new()
         .add_title("My Page")
         .add_h(1, "Hello, World")
-        .add_p("This is a simple HTML demo");
+        .add_p("This is a simple HTML demo")
+        .to_html_string();
     
     println!("{}", html);
 }
