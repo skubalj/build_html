@@ -8,8 +8,12 @@
 //!
 //! let html: String = HtmlPage::new()
 //!     .add_title("My Page")
-//!     .add_h(1, "Hello, World")
-//!     .add_p("This is a simple HTML demo")
+//!     .add_header(1, "Main Content:")
+//!     .add_container(
+//!         Container::new(ContainerType::Article)
+//!             .add_header(2, "Hello, World")
+//!             .add_paragraph("This is a simple HTML demo")
+//!     )
 //!     .to_html_string();
 //!    
 //! println!("{}", html);
@@ -24,17 +28,20 @@
 //!         <title>My Page</title>
 //!     </head>
 //!     <body>
-//!         <h1>Hello World</h1>
-//!         <p>This is a simple HTML demo</p>
+//!         <h1>Main Content:</h1>
+//!         <article>
+//!             <h2>Hello World</h2>
+//!             <p>This is a simple HTML demo</p>
+//!         </article>
 //!     </body>
 //! </html>
 //! ```
 //!
 
-use std::fmt::{self, Display};
 use content::HeadContent;
+use std::fmt::{self, Display};
 
-pub use containers::HtmlContainer;
+pub use containers::{Container, ContainerType, HtmlContainer};
 
 pub mod containers;
 mod content;
@@ -107,7 +114,7 @@ impl HtmlPage {
     /// Adds a title to this HTML page
     pub fn add_title(mut self, title_text: &str) -> Self {
         let title = HeadContent::Title {
-            content: title_text.into()
+            content: title_text.into(),
         };
         self.head.push(Box::new(title));
         self

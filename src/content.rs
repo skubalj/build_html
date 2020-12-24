@@ -38,7 +38,7 @@ impl Html for BodyContent {
             BodyContent::Paragraph { content } => format!("<p>{}</p>", content),
             BodyContent::Preformatted { content } => format!("<pre>{}</pre>", content),
             BodyContent::Link { href, content } => format!(r#"<a href="{}">{}</a>"#, href, content),
-            BodyContent::Image { src, alt } => format!(r#"<img src="{}" alt="{}" />"#, src, alt),
+            BodyContent::Image { src, alt } => format!(r#"<img src="{}" alt="{}">"#, src, alt),
         }
     }
 }
@@ -47,6 +47,7 @@ impl Html for BodyContent {
 mod tests {
     use super::*;
 
+    /// Tests for the `HeadContent` enum
     mod head_content {
         use super::{HeadContent, Html};
         use test_case::test_case;
@@ -57,6 +58,7 @@ mod tests {
         }
     }
 
+    /// Tests for the `BodyContent` enum
     mod body_content {
         use super::{BodyContent, Html};
         use test_case::test_case;
@@ -64,7 +66,7 @@ mod tests {
         #[test_case(BodyContent::Header {level: 1, content: "hello".into()}, "<h1>hello</h1>"; "test_header_1")]
         #[test_case(BodyContent::Header {level: 6, content: "world".into()}, "<h6>world</h6>"; "test_header_6")]
         #[test_case(BodyContent::Image {src: "abc.jpg".into(), alt: "test".into()}, r#"<img src="abc.jpg" alt="test">"#; "test_image")]
-        #[test_case(BodyContent::Link {href: "https://rust-lang.org/".into(), content: "rust".into()}, r#"<a href="https://rust-lang.org">rust</a>"#; "test_link")]
+        #[test_case(BodyContent::Link {href: "https://rust-lang.org/".into(), content: "rust".into()}, r#"<a href="https://rust-lang.org/">rust</a>"#; "test_link")]
         #[test_case(BodyContent::Paragraph {content: "abc 123 def".into()}, "<p>abc 123 def</p>"; "test_paragraph")]
         #[test_case(BodyContent::Preformatted {content: "i => is | code".into()}, "<pre>i => is | code</pre>"; "test_pre_tag")]
         fn to_html_string(sut: BodyContent, expected: &str) {

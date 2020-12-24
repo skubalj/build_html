@@ -7,25 +7,30 @@ This project is a library for generating HTML code from within Rust. It was conc
 lack of a simple way to dynamically create an HTML document from within Rust. 
 
 ## Use
+To use this crate, simply use the import: 
+```rust
+use html_gen::*;
+```
+
 This project was created with the decorator pattern in mind. To create an HTML document, start with
 an `HttpPage`, and build up the document with chained method calls. Once the document is built up,
 convert it to a `String` using `to_html_string()`. 
 
 ```rust
-use http_gen::*;
+use html_gen::*;
 
-fn main() {
-    let html: String = HtmlPage::new()
-        .add_title("My Page")
-        .add_h(1, "Hello, World")
-        .add_p("This is a simple HTML demo")
-        .to_html_string();
-    
-    println!("{}", html);
-}
+let html: String = HtmlPage::new()
+    .add_title("My Page")
+    .add_header(1, "Main Content:")
+    .add_container(
+        Container::new(ContainerType::Article)
+            .add_header(2, "Hello, World")
+            .add_paragraph("This is a simple HTML demo")
+    )
+    .to_html_string();
 ```
 
-produces a string equivalent to: 
+produces a `String` equivalent to:
 
 ```html
 <!DOCTYPE html>
@@ -34,8 +39,11 @@ produces a string equivalent to:
         <title>My Page</title>
     </head>
     <body>
-        <h1>Hello World</h1>
-        <p>This is a simple HTML demo</p>
+        <h1>Main Content:</h1>
+        <article>
+            <h2>Hello World</h2>
+            <p>This is a simple HTML demo</p>
+        </article>
     </body>
 </html>
 ```

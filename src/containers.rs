@@ -16,22 +16,13 @@ pub trait HtmlContainer: Html + Sized {
     /// Adds the specified HTML element to this container
     fn add_html(self, html: Box<dyn Html>) -> Self;
 
-    /// Adds an `<a>` tag to this container
-    fn add_a(self, href: &str, text: &str) -> Self {
-        let content = BodyContent::Link {
-            href: href.into(),
-            content: text.into(),
-        };
-        self.add_html(Box::new(content))
-    }
-
     /// Nest the specified container within this container
     fn add_container(self, container: Container) -> Self {
         self.add_html(Box::new(container))
     }
 
     /// Adds a header tag with the designated level to this container
-    fn add_h(self, level: u8, text: &str) -> Self {
+    fn add_header(self, level: u8, text: &str) -> Self {
         let content = BodyContent::Header {
             level,
             content: text.into(),
@@ -39,8 +30,26 @@ pub trait HtmlContainer: Html + Sized {
         self.add_html(Box::new(content))
     }
 
+    /// Adds an `<img>` tag to this container
+    fn add_image(self, src: &str, alt: &str) -> Self {
+        let content = BodyContent::Image {
+            src: src.into(),
+            alt: alt.into(),
+        };
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds an `<a>` tag to this container
+    fn add_link(self, href: &str, text: &str) -> Self {
+        let content = BodyContent::Link {
+            href: href.into(),
+            content: text.into(),
+        };
+        self.add_html(Box::new(content))
+    }
+
     /// Adds a `<p>` tag element to this Container
-    fn add_p(self, text: &str) -> Self {
+    fn add_paragraph(self, text: &str) -> Self {
         let content = BodyContent::Paragraph {
             content: text.into(),
         };
@@ -48,7 +57,7 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Adds a `<pre>` tag element to this container
-    fn add_pre(self, text: &str) -> Self {
+    fn add_preformatted(self, text: &str) -> Self {
         let content = BodyContent::Preformatted {
             content: text.into(),
         };
@@ -145,9 +154,9 @@ mod tests {
         #[test_case(Container::new(ContainerType::Div), "rust-lang.org", "rust", r#"<div><a href="rust-lang.org">rust</a></div>"#; "test_div")]
         #[test_case(Container::new(ContainerType::OrderedList), "abc", "123", r#"<ol><li><a href="abc">123</a></li></ol>"#; "test_ordered_list")]
         #[test_case(Container::new(ContainerType::UnorderedList), "abc", "123", r#"<ul><li><a href="abc">123</a></li></ul>"#; "test_unordered_list")]
-        fn test_add_a(container: Container, href: &str, text: &str, expected: &str) {
+        fn test_add_link(container: Container, href: &str, text: &str, expected: &str) {
             // Act
-            let actual = container.add_a(href, text).to_html_string();
+            let actual = container.add_link(href, text).to_html_string();
 
             // Assert
             assert_eq!(actual, expected);
@@ -156,9 +165,9 @@ mod tests {
         #[test_case(Container::new(ContainerType::Div), "hello world", "<div><p>hello world</p></div>"; "test_div")]
         #[test_case(Container::new(ContainerType::OrderedList), "hello world", "<ol><li><p>hello world</p></li></ol>"; "test_ordered_list")]
         #[test_case(Container::new(ContainerType::UnorderedList), "hello world", "<ul><li><p>hello world</p></li></ul>"; "test_unordered_list")]
-        fn test_add_p(container: Container, text: &str, expected: &str) {
+        fn test_add_paragraph(container: Container, text: &str, expected: &str) {
             // Act
-            let actual = container.add_p(text).to_html_string();
+            let actual = container.add_paragraph(text).to_html_string();
 
             // Assert
             assert_eq!(actual, expected);
