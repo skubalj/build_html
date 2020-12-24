@@ -32,9 +32,9 @@
 //!
 
 use std::fmt::{self, Display};
+use content::HeadContent;
 
 pub use containers::HtmlContainer;
-use content::{TextContent, TextContentType};
 
 pub mod containers;
 mod content;
@@ -85,7 +85,7 @@ impl HtmlContainer for HtmlPage {
 
 impl Default for HtmlPage {
     fn default() -> Self {
-        HtmlPage::new().add_title("Default Page")
+        HtmlPage::new()
     }
 }
 
@@ -106,7 +106,9 @@ impl HtmlPage {
 
     /// Adds a title to this HTML page
     pub fn add_title(mut self, title_text: &str) -> Self {
-        let title = TextContent::new(TextContentType::Title, title_text);
+        let title = HeadContent::Title {
+            content: title_text.into()
+        };
         self.head.push(Box::new(title));
         self
     }
@@ -130,7 +132,7 @@ mod tests {
             // Assert
             assert_eq!(
                 html_string,
-                "<!DOCTYPE html><html><head><title>Default Page</title></head><body></body></html>"
+                "<!DOCTYPE html><html><head></head><body></body></html>"
             )
         }
     }

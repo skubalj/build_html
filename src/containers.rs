@@ -3,7 +3,7 @@
 //!
 //! Containers implement
 
-use crate::content::{Link, TextContent, TextContentType};
+use crate::content::BodyContent;
 use crate::Html;
 
 use std::fmt::{self, Debug, Display};
@@ -18,7 +18,10 @@ pub trait HtmlContainer: Html + Sized {
 
     /// Adds an `<a>` tag to this container
     fn add_a(self, href: &str, text: &str) -> Self {
-        let content = Link::new(href, text);
+        let content = BodyContent::Link {
+            href: href.into(),
+            content: text.into(),
+        };
         self.add_html(Box::new(content))
     }
 
@@ -29,19 +32,26 @@ pub trait HtmlContainer: Html + Sized {
 
     /// Adds a header tag with the designated level to this container
     fn add_h(self, level: u8, text: &str) -> Self {
-        let content = TextContent::new(TextContentType::Header(level), text);
+        let content = BodyContent::Header {
+            level,
+            content: text.into(),
+        };
         self.add_html(Box::new(content))
     }
 
     /// Adds a `<p>` tag element to this Container
     fn add_p(self, text: &str) -> Self {
-        let content = TextContent::new(TextContentType::Paragraph, text);
+        let content = BodyContent::Paragraph {
+            content: text.into(),
+        };
         self.add_html(Box::new(content))
     }
 
     /// Adds a `<pre>` tag element to this container
     fn add_pre(self, text: &str) -> Self {
-        let content = TextContent::new(TextContentType::Preformatted, text);
+        let content = BodyContent::Preformatted {
+            content: text.into(),
+        };
         self.add_html(Box::new(content))
     }
 }

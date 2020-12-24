@@ -2,66 +2,43 @@
 
 use crate::Html;
 
-use std::fmt::{self, Display};
-
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub enum TextContentType {
-    Header(u8),
-    Paragraph,
-    Preformatted,
-    Title,
+pub enum HeadContent {
+    Title { content: String },
 }
 
-impl Display for TextContentType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Html for HeadContent {
+    fn to_html_string(&self) -> String {
         match self {
-            TextContentType::Header(n) => write!(f, "h{}", n),
-            TextContentType::Paragraph => write!(f, "p"),
-            TextContentType::Preformatted => write!(f, "pre"),
-            TextContentType::Title => write!(f, "title"),
+            HeadContent::Title { content } => format!("<title>{}</title>", content),
         }
     }
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub struct TextContent {
-    tag: TextContentType,
-    content: String,
+pub enum BodyContent {
+    /// An HTML header element `<h#>`
+    Header { level: u8, content: String },
+    /// An HTML image element `<img>`
+    Image { src: String, alt: String },
+    /// An HTML link element `<a>`
+    Link { href: String, content: String },
+    /// An HTML text element `<p>`
+    Paragraph { content: String },
+    /// An HTML preformatted text element `<pre>`
+    Preformatted { content: String },
 }
 
-impl Html for TextContent {
+impl Html for BodyContent {
     fn to_html_string(&self) -> String {
-        format!("<{}>{}</{}>", self.tag, self.content, self.tag)
-    }
-}
-
-impl TextContent {
-    pub fn new(tag: TextContentType, text_content: &str) -> Self {
-        TextContent {
-            tag,
-            content: text_content.into(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub struct Link {
-    href: String,
-    text: String,
-}
-
-impl Html for Link {
-    fn to_html_string(&self) -> String {
-        format!(r#"<a href="{}">{}</a>"#, self.href, self.text)
-    }
-}
-
-impl Link {
-    /// Make a new link element with the specified `href` and text
-    pub fn new(href: &str, text: &str) -> Self {
-        Link {
-            href: href.into(),
-            text: text.into(),
+        match self {
+            BodyContent::Header { level, content } => {
+                format!("<h{}>{}</h{}>", level, content, level)
+            }
+            BodyContent::Paragraph { content } => format!("<p>{}</p>", content),
+            BodyContent::Preformatted { content } => format!("<pre>{}</pre>", content),
+            BodyContent::Link { href, content } => format!(r#"<a href="{}">{}</a>"#, href, content),
+            BodyContent::Image { src, alt } => format!(r#"<img src="{}" alt="{}" />"#, src, alt),
         }
     }
 }
@@ -70,41 +47,28 @@ impl Link {
 mod tests {
     use super::*;
 
-    mod text_content {
-        use super::*;
+    mod head_content {
+        use super::{HeadContent, Html};
         use test_case::test_case;
 
-        #[test_case(TextContentType::Paragraph, "abc 123 def", "<p>abc 123 def</p>"; "test_p_tag")]
-        #[test_case(TextContentType::Header(1), "hello", "<h1>hello</h1>"; "test_h1_tag")]
-        #[test_case(TextContentType::Header(6), "world", "<h6>world</h6>"; "test_h6_tag")]
-        #[test_case(TextContentType::Preformatted, "i => is | code", "<pre>i => is | code</pre>"; "test_pre_tag")]
-        fn to_html_string(tag: TextContentType, content: &str, expected: &str) {
-            // Arrange
-            let sut = TextContent::new(tag, content);
-
-            // Act
-            let actual = sut.to_html_string();
-
-            // Assert
-            assert_eq!(actual, expected);
+        #[test_case(HeadContent::Title {content: "Page Title".into()}, "<title>Page Title</title>"; "test_title")]
+        fn to_html_string(sut: HeadContent, expected: &str) {
+            assert_eq!(sut.to_html_string(), expected);
         }
     }
 
-    mod link {
-        use super::*;
+    mod body_content {
+        use super::{BodyContent, Html};
         use test_case::test_case;
 
-        #[test_case("https://rust-lang.org/", "Rust Home", r#"<a href="https://rust-lang.org/">Rust Home</a>"#; "test_link_1")]
-        #[test_case("localhost:8080", "local", r#"<a href="localhost:8080">local</a>"#; "test_link_2")]
-        fn to_html_string(href: &str, text: &str, expected: &str) {
-            // Arrange
-            let sut = Link::new(href, text);
-
-            // Act
-            let actual = sut.to_html_string();
-
-            // Assert
-            assert_eq!(actual, expected);
+        #[test_case(BodyContent::Header {level: 1, content: "hello".into()}, "<h1>hello</h1>"; "test_header_1")]
+        #[test_case(BodyContent::Header {level: 6, content: "world".into()}, "<h6>world</h6>"; "test_header_6")]
+        #[test_case(BodyContent::Image {src: "abc.jpg".into(), alt: "test".into()}, r#"<img src="abc.jpg" alt="test">"#; "test_image")]
+        #[test_case(BodyContent::Link {href: "https://rust-lang.org/".into(), content: "rust".into()}, r#"<a href="https://rust-lang.org">rust</a>"#; "test_link")]
+        #[test_case(BodyContent::Paragraph {content: "abc 123 def".into()}, "<p>abc 123 def</p>"; "test_paragraph")]
+        #[test_case(BodyContent::Preformatted {content: "i => is | code".into()}, "<pre>i => is | code</pre>"; "test_pre_tag")]
+        fn to_html_string(sut: BodyContent, expected: &str) {
+            assert_eq!(sut.to_html_string(), expected);
         }
     }
 }
