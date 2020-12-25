@@ -1,5 +1,5 @@
-//! This module contains the `Attributes` struct which defines a collection of 
-//! attributes which can be added to an HTML tag. 
+//! This module contains the `Attributes` struct which defines a collection of
+//! attributes which can be added to an HTML tag.
 
 use std::collections::HashMap;
 use std::fmt;
@@ -56,7 +56,7 @@ impl Default for Attributes {
 }
 
 impl Attributes {
-    /// Create a new empty set of attributes. This is the default way of 
+    /// Create a new empty set of attributes. This is the default way of
     /// creating an attribute without any content. To create an attribute
     /// set with pre-defined content, see [`Attributes::from()`]
     pub fn empty() -> Self {

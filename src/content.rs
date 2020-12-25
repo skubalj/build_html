@@ -1,23 +1,25 @@
 //! This module contains the `BodyContent` and `HeadContent` enums which define
-//! the different types of content that can be added to HTML containers. 
-//! 
-//! Users of this crate should not need to create instances of these enums 
+//! the different types of content that can be added to HTML containers.
+//!
+//! Users of this crate should not need to create instances of these enums
 //! directly, and so the content of this module is not exported. To add content,
-//! the methods of the [`HtmlContainer`](crate::HtmlContainer) trait should be 
-//! used instead. 
+//! the methods of the [`HtmlContainer`](crate::HtmlContainer) trait should be
+//! used instead.
 
 use crate::attributes::Attributes;
 use crate::Html;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum HeadContent {
     Title { content: String },
+    Style { css: String, attr: Attributes },
 }
 
 impl Html for HeadContent {
     fn to_html_string(&self) -> String {
         match self {
             HeadContent::Title { content } => format!("<title>{}</title>", content),
+            HeadContent::Style { css, attr } => format!("<style{}>{}</style>", attr, css),
         }
     }
 }
@@ -55,19 +57,34 @@ impl Html for BodyContent {
                 level,
                 content,
                 attr,
-            } => format!("<h{}{}>{}</h{}>", level, attr, content, level),
-            BodyContent::Paragraph { content, attr } => format!("<p{}>{}</p>", attr, content),
+            } => format!(
+                "<h{level}{attr}>{content}</h{level}>",
+                level = level,
+                attr = attr,
+                content = content
+            ),
+            BodyContent::Paragraph { content, attr } => {
+                format!("<p{attr}>{content}</p>", attr = attr, content = content)
+            }
             BodyContent::Preformatted { content, attr } => {
-                format!("<pre{}>{}</pre>", attr, content)
+                format!("<pre{attr}>{content}</pre>", attr = attr, content = content)
             }
             BodyContent::Link {
                 href,
                 content,
                 attr,
-            } => format!(r#"<a href="{}"{}>{}</a>"#, href, attr, content),
-            BodyContent::Image { src, alt, attr } => {
-                format!(r#"<img src="{}" alt="{}"{}>"#, src, alt, attr)
-            }
+            } => format!(
+                r#"<a href="{href}"{attr}>{content}</a>"#,
+                href = href,
+                attr = attr,
+                content = content
+            ),
+            BodyContent::Image { src, alt, attr } => format!(
+                r#"<img src="{src}" alt="{alt}"{attr}>"#,
+                src = src,
+                alt = alt,
+                attr = attr
+            ),
         }
     }
 }
