@@ -11,7 +11,7 @@
 //!     .add_title("My Page")
 //!     .add_header(1, "Main Content:", None)
 //!     .add_container(
-//!         Container::new(ContainerType::Article)
+//!         Container::new(ContainerType::Article, Some(hashmap! {"id" => "art1"}))
 //!             .add_header(2, "Hello, World", Some(hashmap! {"id" => "article-head"}))
 //!             .add_paragraph("This is a simple HTML demo", None)
 //!     )
@@ -30,7 +30,7 @@
 //!     </head>
 //!     <body>
 //!         <h1>Main Content:</h1>
-//!         <article>
+//!         <article id="art1">
 //!             <h2 id="article-head">Hello World</h2>
 //!             <p>This is a simple HTML demo</p>
 //!         </article>
@@ -85,7 +85,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.into(),
             attr: attributes
                 .map(|map| Attributes::from(map))
-                .unwrap_or(Attributes::empty()),
+                .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
     }
@@ -107,7 +107,7 @@ pub trait HtmlContainer: Html + Sized {
             alt: alt.into(),
             attr: attributes
                 .map(|map| Attributes::from(map))
-                .unwrap_or(Attributes::empty()),
+                .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
     }
@@ -130,7 +130,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.into(),
             attr: attributes
                 .map(|map| Attributes::from(map))
-                .unwrap_or(Attributes::empty()),
+                .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
     }
@@ -152,7 +152,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.into(),
             attr: attributes
                 .map(|map| Attributes::from(map))
-                .unwrap_or(Attributes::empty()),
+                .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
     }
@@ -173,7 +173,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.into(),
             attr: attributes
                 .map(|map| Attributes::from(map))
-                .unwrap_or(Attributes::empty()),
+                .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
     }
@@ -278,6 +278,21 @@ impl HtmlPage {
         self.head.push(Box::new(style));
         self
     }
+
+    /// Adds a new link to the HTML head. 
+    /// 
+    /// This is how to link a stylesheet into the document
+    pub fn add_head_link(mut self, href: &str, rel: &str, attributes: Option<HashMap<&str, &str>>)-> Self {
+        let link = HeadContent::Link {
+            href: href.into(),
+            rel: rel.into(),
+            attr: attributes
+                .map(|map| Attributes::from(map))
+                .unwrap_or_default(),
+        };
+        self.head.push(Box::new(link));
+        self
+    }
 }
 
 /// The different types of Html Containers that can be added to the page
@@ -350,17 +365,19 @@ impl HtmlContainer for Container {
 
 impl Default for Container {
     fn default() -> Self {
-        Container::new(ContainerType::Div)
+        Container::new(ContainerType::Div, None)
     }
 }
 
 impl Container {
     /// Creates a new container with the specified tag.
-    pub fn new(tag: ContainerType) -> Self {
+    pub fn new(tag: ContainerType, attributes: Option<HashMap<&str, &str>>) -> Self {
         Container {
             tag,
             elements: Vec::new(),
-            attr: Attributes::empty(),
+            attr: attributes
+                .map(|map| Attributes::from(map))
+                .unwrap_or_default(),
         }
     }
 }
@@ -407,7 +424,7 @@ mod tests {
             );
 
             // Act
-            let sut = Container::new(container_type)
+            let sut = Container::new(container_type, None)
                 .add_header(1, "header", Some(hashmap! {"id" => "main-header"}))
                 .add_image("myimage.png", "test image", None)
                 .add_link("rust-lang.org", "Rust Home", None)
@@ -438,7 +455,7 @@ mod tests {
             );
 
             // Act
-            let sut = Container::new(container_type)
+            let sut = Container::new(container_type, None)
                 .add_header(1, "header", Some(hashmap! {"id" => "main-header"}))
                 .add_image("myimage.png", "test image", None)
                 .add_link("rust-lang.org", "Rust Home", None)

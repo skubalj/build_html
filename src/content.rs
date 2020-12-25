@@ -11,15 +11,28 @@ use crate::Html;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum HeadContent {
-    Title { content: String },
-    Style { css: String, attr: Attributes },
+    Link {
+        href: String,
+        rel: String,
+        attr: Attributes,
+    },
+    Style {
+        css: String,
+        attr: Attributes,
+    },
+    Title {
+        content: String,
+    },
 }
 
 impl Html for HeadContent {
     fn to_html_string(&self) -> String {
         match self {
-            HeadContent::Title { content } => format!("<title>{}</title>", content),
+            HeadContent::Link { href, rel, attr } => {
+                format!(r#"<link href="{}" rel="{}"{}>"#, href, rel, attr)
+            }
             HeadContent::Style { css, attr } => format!("<style{}>{}</style>", attr, css),
+            HeadContent::Title { content } => format!("<title>{}</title>", content),
         }
     }
 }

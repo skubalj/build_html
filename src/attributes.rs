@@ -49,9 +49,7 @@ impl From<HashMap<&str, &str>> for Attributes {
 
 impl Default for Attributes {
     fn default() -> Self {
-        Attributes {
-            attributes: HashMap::new(),
-        }
+        Self::empty()
     }
 }
 
@@ -60,7 +58,9 @@ impl Attributes {
     /// creating an attribute without any content. To create an attribute
     /// set with pre-defined content, see [`Attributes::from()`]
     pub fn empty() -> Self {
-        Self::default()
+        Attributes {
+            attributes: HashMap::new(),
+        }
     }
 }
 
@@ -69,15 +69,6 @@ mod tests {
     use super::*;
     use maplit::hashmap;
     use test_case::test_case;
-
-    #[test]
-    fn empty() {
-        // Act
-        let sut = Attributes::empty();
-
-        // Assert
-        assert!(sut.attributes.is_empty())
-    }
 
     #[test]
     fn from_hash() {
