@@ -49,9 +49,7 @@ impl Html for BodyContent {
                 level,
                 content,
                 attr,
-            } => {
-                format!("<h{}{}>{}</h{}>", level, attr, content, level)
-            }
+            } => format!("<h{}{}>{}</h{}>", level, attr, content, level),
             BodyContent::Paragraph { content, attr } => format!("<p{}>{}</p>", attr, content),
             BodyContent::Preformatted { content, attr } => {
                 format!("<pre{}>{}</pre>", attr, content)

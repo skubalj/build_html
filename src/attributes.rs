@@ -1,3 +1,5 @@
+//!
+
 use std::collections::HashMap;
 use std::fmt;
 
@@ -7,11 +9,18 @@ pub struct Attributes {
 }
 
 impl fmt::Display for Attributes {
+    /// Converts this set of `Attributes` to an attribute string. 
+    /// 
+    /// Note that the attributes are automatically sorted. 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let content = self
+        let mut attribute_tags: Vec<String> = self
             .attributes
             .iter()
             .map(|(key, value)| format!(r#" {}="{}""#, key, value))
+            .collect();
+        attribute_tags.sort();
+        let content = attribute_tags
+            .iter()
             .fold(String::new(), |acc, next| acc + &next);
 
         write!(f, "{}", content)
@@ -55,6 +64,8 @@ impl Attributes {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use maplit::hashmap;
+    use test_case::test_case;
 
     #[test]
     fn empty() {
@@ -63,5 +74,33 @@ mod tests {
 
         // Assert
         assert!(sut.attributes.is_empty())
+    }
+
+    #[test]
+    fn from_hash() {
+        // Act
+        let sut = Attributes::from(hashmap! {
+            "id" => "my-element",
+            "class" => "my-css-class"
+        });
+
+        // Assert
+        assert_eq!(sut.attributes.len(), 2);
+        assert_eq!(sut.attributes["id"], "my-element");
+        assert_eq!(sut.attributes["class"], "my-css-class");
+    }
+
+    #[test_case(HashMap::new(), "" ; "test_0")]
+    #[test_case(hashmap! {"id" => "my-id"}, r#" id="my-id""# ; "test_1")]
+    #[test_case(hashmap! {"id" => "my-id", "class" => "my-class"}, r#" class="my-class" id="my-id""# ; "test_2")]
+    fn display(map: HashMap<&str, &str>, expected: &str) {
+        // Arrange
+        let sut = Attributes::from(map);
+
+        // Act
+        let actual = format!("{}", sut);
+
+        // Assert
+        assert_eq!(actual, expected);
     }
 }
