@@ -43,6 +43,7 @@ use std::fmt::{self, Display};
 
 pub use containers::{Container, ContainerType, HtmlContainer};
 
+mod attributes;
 pub mod containers;
 mod content;
 

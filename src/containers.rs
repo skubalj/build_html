@@ -3,6 +3,7 @@
 //!
 //! Containers implement
 
+use crate::attributes::Attributes;
 use crate::content::BodyContent;
 use crate::Html;
 
@@ -26,6 +27,7 @@ pub trait HtmlContainer: Html + Sized {
         let content = BodyContent::Header {
             level,
             content: text.into(),
+            attr: Attributes::empty(),
         };
         self.add_html(Box::new(content))
     }
@@ -35,6 +37,7 @@ pub trait HtmlContainer: Html + Sized {
         let content = BodyContent::Image {
             src: src.into(),
             alt: alt.into(),
+            attr: Attributes::empty(),
         };
         self.add_html(Box::new(content))
     }
@@ -44,6 +47,7 @@ pub trait HtmlContainer: Html + Sized {
         let content = BodyContent::Link {
             href: href.into(),
             content: text.into(),
+            attr: Attributes::empty(),
         };
         self.add_html(Box::new(content))
     }
@@ -52,6 +56,7 @@ pub trait HtmlContainer: Html + Sized {
     fn add_paragraph(self, text: &str) -> Self {
         let content = BodyContent::Paragraph {
             content: text.into(),
+            attr: Attributes::empty(),
         };
         self.add_html(Box::new(content))
     }
@@ -60,6 +65,7 @@ pub trait HtmlContainer: Html + Sized {
     fn add_preformatted(self, text: &str) -> Self {
         let content = BodyContent::Preformatted {
             content: text.into(),
+            attr: Attributes::empty(),
         };
         self.add_html(Box::new(content))
     }
@@ -99,6 +105,7 @@ impl Display for ContainerType {
 pub struct Container {
     tag: ContainerType,
     elements: Vec<Box<dyn Html>>,
+    attr: Attributes,
 }
 
 impl Html for Container {
@@ -116,7 +123,7 @@ impl Html for Container {
                 .fold(String::new(), |acc, next| acc + &next),
         };
 
-        format!("<{}>{}</{}>", self.tag, content, self.tag)
+        format!("<{}{}>{}</{}>", self.tag, self.attr, content, self.tag)
     }
 }
 
@@ -139,6 +146,7 @@ impl Container {
         Container {
             tag,
             elements: Vec::new(),
+            attr: Attributes::empty(),
         }
     }
 }
