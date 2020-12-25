@@ -1,4 +1,5 @@
-//!
+//! This module contains the `Attributes` struct which defines a collection of 
+//! attributes which can be added to an HTML tag. 
 
 use std::collections::HashMap;
 use std::fmt;
@@ -9,9 +10,9 @@ pub struct Attributes {
 }
 
 impl fmt::Display for Attributes {
-    /// Converts this set of `Attributes` to an attribute string. 
-    /// 
-    /// Note that the attributes are automatically sorted. 
+    /// Converts this set of `Attributes` to an attribute string.
+    ///
+    /// Note that the attributes are automatically sorted.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut attribute_tags: Vec<String> = self
             .attributes
@@ -55,7 +56,9 @@ impl Default for Attributes {
 }
 
 impl Attributes {
-    /// Create a new empty set of attributes
+    /// Create a new empty set of attributes. This is the default way of 
+    /// creating an attribute without any content. To create an attribute
+    /// set with pre-defined content, see [`Attributes::from()`]
     pub fn empty() -> Self {
         Self::default()
     }

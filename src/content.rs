@@ -1,4 +1,10 @@
-//! This module contains structs used to add text content to an HTML page
+//! This module contains the `BodyContent` and `HeadContent` enums which define
+//! the different types of content that can be added to HTML containers. 
+//! 
+//! Users of this crate should not need to create instances of these enums 
+//! directly, and so the content of this module is not exported. To add content,
+//! the methods of the [`HtmlContainer`](crate::HtmlContainer) trait should be 
+//! used instead. 
 
 use crate::attributes::Attributes;
 use crate::Html;

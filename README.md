@@ -6,6 +6,9 @@ html-gen: Rust HTML Generation
 This project is a library for generating HTML code from within Rust. It was conceived due to the 
 lack of a simple way to dynamically create an HTML document from within Rust. 
 
+I see this crate being useful for outputting HTML reports of an operation, or for providing simple
+HTML content from a web server.
+
 ## Use
 To use this crate, simply use the import: 
 ```rust

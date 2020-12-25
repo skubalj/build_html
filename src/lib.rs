@@ -53,7 +53,8 @@ pub trait Html: fmt::Debug {
 
 /// An HTML element that can contain other HTML elements
 ///
-/// HTML containers include tags such as: `article`, `div`, `ol`, `ul`.
+/// This trait implements the majority of the specific "add x" methods, requiring implementors
+/// to add only one method: [`add_html()`](crate::HtmlContainer::add_html)
 pub trait HtmlContainer: Html + Sized {
     /// Adds the specified HTML element to this container
     fn add_html(self, html: Box<dyn Html>) -> Self;
@@ -64,6 +65,17 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Adds a header tag with the designated level to this container
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_header(1, "Header Text")
+    ///     .add_header(2, "Sub-header Text")
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(content, "<div><h1>Header Text</h1><h2>Sub-header Text</h2></div>")
+    /// ```
     fn add_header(self, level: u8, text: &str) -> Self {
         let content = BodyContent::Header {
             level,
@@ -74,6 +86,16 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Adds an `<img>` tag to this container
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_image("myimage.png", "a test image")
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(content, r#"<div><img src="myimage.png" alt="a test image"></div>"#)
+    /// ```
     fn add_image(self, src: &str, alt: &str) -> Self {
         let content = BodyContent::Image {
             src: src.into(),
@@ -84,6 +106,16 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Adds an `<a>` tag to this container
+    /// 
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_link("https://rust-lang.org/", "Rust Homepage")
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(content, r#"<div><a href="https://rust-lang.org/">Rust Homepage</a></div>"#)
+    /// ```
     fn add_link(self, href: &str, text: &str) -> Self {
         let content = BodyContent::Link {
             href: href.into(),
@@ -94,6 +126,16 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Adds a `<p>` tag element to this Container
+    /// 
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_paragraph("This is sample paragraph text")
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(content, r#"<div><p>This is sample paragraph text</p></div>"#)
+    /// ```
     fn add_paragraph(self, text: &str) -> Self {
         let content = BodyContent::Paragraph {
             content: text.into(),
@@ -103,6 +145,16 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Adds a `<pre>` tag element to this container
+    /// 
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_preformatted("This | is   preformatted => text")
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(content, r#"<div><pre>This | is   preformatted => text</pre></div>"#)
+    /// ```
     fn add_preformatted(self, text: &str) -> Self {
         let content = BodyContent::Preformatted {
             content: text.into(),
@@ -113,15 +165,15 @@ pub trait HtmlContainer: Html + Sized {
 }
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
-/// 
+///
 /// This creates an effect similar to the [Decorator Pattern](https://en.wikipedia.org/wiki/Decorator_pattern)
 ///
 /// To convert an `HtmlPage` to a [`String`] which can be sent back to a client, use the
 /// [`Html::to_html_string()`] method
-/// 
+///
 /// # Example
 /// ```
-/// # use html_gen::*; 
+/// # use html_gen::*;
 /// let page: String = HtmlPage::new()
 ///     .add_title("My Page")
 ///     .add_header(1, "Header Text")
