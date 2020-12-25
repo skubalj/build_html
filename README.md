@@ -53,6 +53,7 @@ Special thanks to Sean McArthur; the way that filters work in [warp](https://cra
 was a major inspiration for how programmers would interact with this library.
 
 This project was made possible thanks to the following great projects:
+* [maplit](https://crates.io/crates/maplit): Bluss
 * [test-case](https://crates.io/crates/test-case): Marcin Sas-Szymanski, Wojciech Polak
 * [Rust](https://rust-lang.org)
 

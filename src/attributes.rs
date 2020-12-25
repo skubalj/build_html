@@ -25,14 +25,14 @@ impl From<HashMap<String, String>> for Attributes {
     }
 }
 
-impl From<&[(&str, &str)]> for Attributes {
-    /// Create a new `Attributes` collection from the specified slice
-    fn from(vec: &[(&str, &str)]) -> Self {
+impl From<HashMap<&str, &str>> for Attributes {
+    /// Creates a new `Attributes` collection from the specified HashMap
+    fn from(hash: HashMap<&str, &str>) -> Self {
         Attributes {
-            attributes: vec
-                .iter()
-                .map(|(k, v)| (String::from(*k), String::from(*v)))
-                .collect::<HashMap<String, String>>(),
+            attributes: hash
+                .into_iter()
+                .map(|(k, v)| (String::from(k), String::from(v)))
+                .collect(),
         }
     }
 }
@@ -57,9 +57,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn new() {
+    fn empty() {
         // Act
-        let sut = Attributes::new();
+        let sut = Attributes::empty();
 
         // Assert
         assert!(sut.attributes.is_empty())

@@ -10,3 +10,4 @@ edition = "2018"
 
 [dev-dependencies]
 test-case = "1.0.0"
+maplit = "1.0.2"

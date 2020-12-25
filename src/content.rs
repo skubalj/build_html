@@ -86,7 +86,7 @@ mod tests {
     /// Tests for the `BodyContent` enum
     mod body_content {
         use super::*;
-        use test_case::test_case;
+        use maplit::hashmap;
 
         #[test]
         fn test_header_1() {
@@ -101,26 +101,86 @@ mod tests {
             assert_eq!(sut.to_html_string(), "<h1>Main Heading</h1>")
         }
 
+        #[test]
         fn test_header_6() {
             // Arrange
             let sut = BodyContent::Header {
                 level: 6,
                 content: "Sub Heading".into(),
-                attr: Attributes::from(&[("id", "sub"), ("class", "heading")][..])
+                attr: Attributes::from(hashmap! {
+                    "id" => "sub",
+                    "class" => "heading"
+                }),
             };
 
             // Act / Assert
-            assert_eq!(sut.to_html_string(), r#"<h6 class="heading" id="sub">Sub Heading</h6>"#)
+            assert_eq!(
+                sut.to_html_string(),
+                r#"<h6 class="heading" id="sub">Sub Heading</h6>"#
+            )
         }
 
-        #[test_case(BodyContent::Header {level: 1, content: "hello".into()}, "<h1>hello</h1>"; "test_header_1")]
-        #[test_case(BodyContent::Header {level: 6, content: "world".into()}, "<h6>world</h6>"; "test_header_6")]
-        #[test_case(BodyContent::Image {src: "abc.jpg".into(), alt: "test".into()}, r#"<img src="abc.jpg" alt="test">"#; "test_image")]
-        #[test_case(BodyContent::Link {href: "https://rust-lang.org/".into(), content: "rust".into()}, r#"<a href="https://rust-lang.org/">rust</a>"#; "test_link")]
-        #[test_case(BodyContent::Paragraph {content: "abc 123 def".into()}, "<p>abc 123 def</p>"; "test_paragraph")]
-        #[test_case(BodyContent::Preformatted {content: "i => is | code".into()}, "<pre>i => is | code</pre>"; "test_pre_tag")]
-        fn to_html_string(sut: BodyContent, expected: &str) {
-            assert_eq!(sut.to_html_string(), expected);
+        #[test]
+        fn test_image() {
+            // Arrange
+            let sut = BodyContent::Image {
+                src: "myImage.jpg".into(),
+                alt: "This is alternate text".into(),
+                attr: Attributes::from(hashmap! {"class" => "images"}),
+            };
+
+            // Act / Assert
+            assert_eq!(
+                sut.to_html_string(),
+                r#"<img src="myImage.jpg" alt="This is alternate text" class="images">"#
+            )
+        }
+
+        #[test]
+        fn test_link() {
+            // Arrange
+            let sut = BodyContent::Link {
+                href: "https://rust-lang.org".into(),
+                content: "Rust Homepage".into(),
+                attr: Attributes::empty(),
+            };
+
+            // Act / Assert
+            assert_eq!(
+                sut.to_html_string(),
+                r#"<a href="https://rust-lang.org">Rust Homepage</a>"#
+            )
+        }
+
+        #[test]
+        fn test_paragraph() {
+            // Arrange
+            let sut = BodyContent::Paragraph {
+                content: "This is sample text".into(),
+                attr: Attributes::from(hashmap! {
+                    "id" => "test-text",
+                    "onclick" => "something()",
+                    "class" => "text"
+                }),
+            };
+
+            // Act / Assert
+            assert_eq!(
+                sut.to_html_string(),
+                r#"<p class="text" id="test-text" onclick="something()">This is sample text</p>"#
+            )
+        }
+
+        #[test]
+        fn test_preformatted() {
+            // Arrange
+            let sut = BodyContent::Preformatted {
+                content: "Pre => formatted".into(),
+                attr: Attributes::empty(),
+            };
+
+            // Act / Assert
+            assert_eq!(sut.to_html_string(), r#"<pre>Pre => formatted</pre>"#)
         }
     }
 }
