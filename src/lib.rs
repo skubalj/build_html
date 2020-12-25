@@ -84,7 +84,7 @@ pub trait HtmlContainer: Html + Sized {
             level,
             content: text.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
@@ -106,7 +106,7 @@ pub trait HtmlContainer: Html + Sized {
             src: src.into(),
             alt: alt.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
@@ -129,7 +129,7 @@ pub trait HtmlContainer: Html + Sized {
             href: href.into(),
             content: text.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
@@ -151,7 +151,7 @@ pub trait HtmlContainer: Html + Sized {
         let content = BodyContent::Paragraph {
             content: text.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
@@ -172,7 +172,7 @@ pub trait HtmlContainer: Html + Sized {
         let content = BodyContent::Preformatted {
             content: text.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.add_html(Box::new(content))
@@ -272,7 +272,7 @@ impl HtmlPage {
         let style = HeadContent::Style {
             css: css.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.head.push(Box::new(style));
@@ -287,7 +287,7 @@ impl HtmlPage {
             href: href.into(),
             rel: rel.into(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         };
         self.head.push(Box::new(link));
@@ -298,10 +298,17 @@ impl HtmlPage {
 /// The different types of Html Containers that can be added to the page
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum ContainerType {
+    /// Corresponds to `<article>` tags
     Article,
+    /// Corresponds to `<div>` tags
+    /// 
+    /// This type is also the default for `Container`s
     Div,
+    /// Corresponds to `<main>` tags
     Main,
+    /// Corresponds to `<ol>` tags
     OrderedList,
+    /// Corresponds to `<ul>` tags
     UnorderedList,
 }
 
@@ -376,7 +383,7 @@ impl Container {
             tag,
             elements: Vec::new(),
             attr: attributes
-                .map(|map| Attributes::from(map))
+                .map(Attributes::from)
                 .unwrap_or_default(),
         }
     }
