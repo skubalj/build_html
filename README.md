@@ -19,21 +19,28 @@ This project was created with the decorator pattern in mind. To create an HTML d
 an `HttpPage`, and build up the document with chained method calls. Once the document is built up,
 convert it to a `String` using `to_html_string()`. 
 
+While adding content, required attributes are specified as method parameters. Additional optional
+parameters (such as `id` or `class` attributes) can be added as a `HashMap`. I recommend using the
+[`maplit`](https://crates.io/crates/maplit) library to create `HashMap` literals. 
+
 ```rust
 use html_gen::*;
+use maplit::hashmap;
 
 let html: String = HtmlPage::new()
     .add_title("My Page")
-    .add_header(1, "Main Content:")
+    .add_header(1, "Main Content:", None)
     .add_container(
-        Container::new(ContainerType::Article)
-            .add_header(2, "Hello, World")
-            .add_paragraph("This is a simple HTML demo")
+        Container::new(ContainerType::Article, Some(hashmap! {"id" => "art1"}))
+            .add_header(2, "Hello, World", Some(hashmap! {"id" => "article-head"}))
+            .add_paragraph("This is a simple HTML demo", None)
     )
     .to_html_string();
+   
+println!("{}", html);
 ```
 
-produces a `String` equivalent to:
+produces a string equivalent to:
 
 ```html
 <!DOCTYPE html>
@@ -43,8 +50,8 @@ produces a `String` equivalent to:
     </head>
     <body>
         <h1>Main Content:</h1>
-        <article>
-            <h2>Hello World</h2>
+        <article id="art1">
+            <h2 id="article-head">Hello World</h2>
             <p>This is a simple HTML demo</p>
         </article>
     </body>
