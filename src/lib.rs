@@ -9,15 +9,13 @@
 //!
 //! let html: String = HtmlPage::new()
 //!     .add_title("My Page")
-//!     .add_header(1, "Main Content:", None)
+//!     .add_header(1, "Main Content:")
 //!     .add_container(
 //!         Container::new(ContainerType::Article, Some(hashmap! {"id" => "art1"}))
-//!             .add_header(2, "Hello, World", Some(hashmap! {"id" => "article-head"}))
-//!             .add_paragraph("This is a simple HTML demo", None)
+//!             .add_header_attr(2, "Hello, World", hashmap! {"id" => "article-head"})
+//!             .add_paragraph("This is a simple HTML demo")
 //!     )
 //!     .to_html_string();
-//!    
-//! println!("{}", html);
 //! ```
 //!
 //! produces a string equivalent to:
@@ -71,21 +69,38 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use html_gen::*;
-    /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_header(1, "Header Text", Some(hashmap! {"id" => "main-header"}))
-    ///     .add_header(2, "Sub-header Text", None)
+    ///     .add_header(1, "Header Text")
     ///     .to_html_string();
     ///
-    /// assert_eq!(content, r#"<div><h1 id="main-header">Header Text</h1><h2>Sub-header Text</h2></div>"#)
+    /// assert_eq!(content, r#"<div><h1>Header Text</h1></div>"#)
     /// ```
-    fn add_header(self, level: u8, text: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
+    fn add_header(self, level: u8, text: &str) -> Self {
         let content = BodyContent::Header {
             level,
             content: text.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: Attributes::default(),
+        };
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds a header tag with the designated level and attributes to this container.
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// # use maplit::hashmap;
+    /// let content = Container::default()
+    ///     .add_header_attr(1, "Header Text", hashmap! {"id" => "main-header"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(content, r#"<div><h1 id="main-header">Header Text</h1></div>"#)
+    /// ```
+    fn add_header_attr(self, level: u8, text: &str, attributes: HashMap<&str, &str>) -> Self {
+        let content = BodyContent::Header {
+            level,
+            content: text.into(),
+            attr: Attributes::from(attributes),
         };
         self.add_html(Box::new(content))
     }
@@ -96,18 +111,40 @@ pub trait HtmlContainer: Html + Sized {
     /// ```
     /// # use html_gen::*;
     /// let content = Container::default()
-    ///     .add_image("myimage.png", "a test image", None)
+    ///     .add_image("myimage.png", "a test image")
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><img src="myimage.png" alt="a test image"></div>"#)
     /// ```
-    fn add_image(self, src: &str, alt: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
+    fn add_image(self, src: &str, alt: &str) -> Self {
         let content = BodyContent::Image {
             src: src.into(),
             alt: alt.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: Attributes::default(),
+        };
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds an `<img>` tag with the specified attributes to this container
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// # use maplit::hashmap;
+    /// let content = Container::default()
+    ///     .add_image_attr("myimage.png", "a test image", hashmap! {"id" => "sample-image"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     content, 
+    ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"></div>"#
+    /// )
+    /// ```
+    fn add_image_attr(self, src: &str, alt: &str, attributes: HashMap<&str, &str>) -> Self {
+        let content = BodyContent::Image {
+            src: src.into(),
+            alt: alt.into(),
+            attr: Attributes::from(attributes),
         };
         self.add_html(Box::new(content))
     }
@@ -117,20 +154,41 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use html_gen::*;
-    /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_link("https://rust-lang.org/", "Rust Homepage", None)
+    ///     .add_link("https://rust-lang.org/", "Rust Homepage")
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><a href="https://rust-lang.org/">Rust Homepage</a></div>"#)
     /// ```
-    fn add_link(self, href: &str, text: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
+    fn add_link(self, href: &str, text: &str) -> Self {
         let content = BodyContent::Link {
             href: href.into(),
             content: text.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: Attributes::default(),
+        };
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds an `<a>` tag with the specified attributes to this container
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// # use maplit::hashmap;
+    /// let content = Container::default()
+    ///     .add_link_attr("https://rust-lang.org/", "Rust Homepage", hashmap! {"class" => "links"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     content, 
+    ///     r#"<div><a href="https://rust-lang.org/" class="links">Rust Homepage</a></div>"#
+    /// )
+    /// ```
+    fn add_link_attr(self, href: &str, text: &str, attributes: HashMap<&str, &str>) -> Self {
+        let content = BodyContent::Link {
+            href: href.into(),
+            content: text.into(),
+            attr: Attributes::from(attributes),
         };
         self.add_html(Box::new(content))
     }
@@ -140,19 +198,36 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_paragraph("This is sample paragraph text")
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(content, r#"<div><p>This is sample paragraph text</p></div>"#)
+    /// ```
+    fn add_paragraph(self, text: &str) -> Self {
+        let content = BodyContent::Paragraph {
+            content: text.into(),
+            attr: Attributes::default(),
+        };
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds a `<p>` tag element with the specified attributes to this Container
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
     /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_paragraph("This is sample paragraph text", Some(hashmap! {"class" => "text"}))
+    ///     .add_paragraph_attr("This is sample paragraph text", hashmap! {"class" => "text"})
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><p class="text">This is sample paragraph text</p></div>"#)
     /// ```
-    fn add_paragraph(self, text: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
+    fn add_paragraph_attr(self, text: &str, attributes: HashMap<&str, &str>) -> Self {
         let content = BodyContent::Paragraph {
             content: text.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: Attributes::from(attributes),
         };
         self.add_html(Box::new(content))
     }
@@ -163,17 +238,35 @@ pub trait HtmlContainer: Html + Sized {
     /// ```
     /// # use html_gen::*;
     /// let content = Container::default()
-    ///     .add_preformatted("This | is   preformatted => text", None)
+    ///     .add_preformatted("This | is   preformatted => text")
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><pre>This | is   preformatted => text</pre></div>"#)
     /// ```
-    fn add_preformatted(self, text: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
+    fn add_preformatted(self, text: &str) -> Self {
         let content = BodyContent::Preformatted {
             content: text.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: Attributes::default(),
+        };
+        self.add_html(Box::new(content))
+    }
+
+    /// Adds a `<pre>` tag element with the specified attributes to this container
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// # use maplit::hashmap;
+    /// let content = Container::default()
+    ///     .add_preformatted_attr("This | is   preformatted => text", hashmap! {"id" => "code"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(content, r#"<div><pre id="code">This | is   preformatted => text</pre></div>"#)
+    /// ```
+    fn add_preformatted_attr(self, text: &str, attributes: HashMap<&str, &str>) -> Self {
+        let content = BodyContent::Preformatted {
+            content: text.into(),
+            attr: Attributes::from(attributes),
         };
         self.add_html(Box::new(content))
     }
@@ -191,7 +284,7 @@ pub trait HtmlContainer: Html + Sized {
 /// # use html_gen::*;
 /// let page: String = HtmlPage::new()
 ///     .add_title("My Page")
-///     .add_header(1, "Header Text", None)
+///     .add_header(1, "Header Text")
 ///     .to_html_string();
 /// ```
 #[derive(Debug)]
@@ -271,24 +364,25 @@ impl HtmlPage {
     pub fn add_style(mut self, css: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
         let style = HeadContent::Style {
             css: css.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: attributes.map(Attributes::from).unwrap_or_default(),
         };
         self.head.push(Box::new(style));
         self
     }
 
-    /// Adds a new link to the HTML head. 
-    /// 
+    /// Adds a new link to the HTML head.
+    ///
     /// This is how to link a stylesheet into the document
-    pub fn add_head_link(mut self, href: &str, rel: &str, attributes: Option<HashMap<&str, &str>>)-> Self {
+    pub fn add_head_link(
+        mut self,
+        href: &str,
+        rel: &str,
+        attributes: Option<HashMap<&str, &str>>,
+    ) -> Self {
         let link = HeadContent::Link {
             href: href.into(),
             rel: rel.into(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: attributes.map(Attributes::from).unwrap_or_default(),
         };
         self.head.push(Box::new(link));
         self
@@ -301,7 +395,7 @@ pub enum ContainerType {
     /// Corresponds to `<article>` tags
     Article,
     /// Corresponds to `<div>` tags
-    /// 
+    ///
     /// This type is also the default for `Container`s
     Div,
     /// Corresponds to `<main>` tags
@@ -382,102 +476,10 @@ impl Container {
         Container {
             tag,
             elements: Vec::new(),
-            attr: attributes
-                .map(Attributes::from)
-                .unwrap_or_default(),
+            attr: attributes.map(Attributes::from).unwrap_or_default(),
         }
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    mod html_page {
-        use super::*;
-
-        #[test]
-        fn default() {
-            // Arrange
-            let sut = HtmlPage::default();
-
-            // Act
-            let html_string = sut.to_html_string();
-
-            // Assert
-            assert_eq!(
-                html_string,
-                "<!DOCTYPE html><html><head></head><body></body></html>"
-            )
-        }
-    }
-
-    mod container {
-        use super::*;
-        use maplit::hashmap;
-        use test_case::test_case;
-
-        #[test_case(ContainerType::Article; "article")]
-        #[test_case(ContainerType::Div; "div")]
-        #[test_case(ContainerType::Main; "main")]
-        fn test_nesting(container_type: ContainerType) {
-            // Expected
-            let content = concat!(
-                r#"<h1 id="main-header">header</h1>"#,
-                r#"<img src="myimage.png" alt="test image">"#,
-                r#"<a href="rust-lang.org">Rust Home</a>"#,
-                r#"<p class="red-text">Sample Text</p>"#,
-                r#"<pre class="code">Text</pre>"#
-            );
-
-            // Act
-            let sut = Container::new(container_type, None)
-                .add_header(1, "header", Some(hashmap! {"id" => "main-header"}))
-                .add_image("myimage.png", "test image", None)
-                .add_link("rust-lang.org", "Rust Home", None)
-                .add_paragraph("Sample Text", Some(hashmap! {"class" => "red-text"}))
-                .add_preformatted("Text", Some(hashmap! {"class" => "code"}));
-
-            // Assert
-            assert_eq!(
-                sut.to_html_string(),
-                format!(
-                    "<{tag}>{content}</{tag}>",
-                    tag = container_type,
-                    content = content
-                )
-            )
-        }
-
-        #[test_case(ContainerType::OrderedList; "ordered_list")]
-        #[test_case(ContainerType::UnorderedList; "unordered_list")]
-        fn test_list(container_type: ContainerType) {
-            // Expected
-            let content = concat!(
-                r#"<li><h1 id="main-header">header</h1></li>"#,
-                r#"<li><img src="myimage.png" alt="test image"></li>"#,
-                r#"<li><a href="rust-lang.org">Rust Home</a></li>"#,
-                r#"<li><p class="red-text">Sample Text</p></li>"#,
-                r#"<li><pre class="code">Text</pre></li>"#
-            );
-
-            // Act
-            let sut = Container::new(container_type, None)
-                .add_header(1, "header", Some(hashmap! {"id" => "main-header"}))
-                .add_image("myimage.png", "test image", None)
-                .add_link("rust-lang.org", "Rust Home", None)
-                .add_paragraph("Sample Text", Some(hashmap! {"class" => "red-text"}))
-                .add_preformatted("Text", Some(hashmap! {"class" => "code"}));
-
-            // Assert
-            assert_eq!(
-                sut.to_html_string(),
-                format!(
-                    "<{tag}>{content}</{tag}>",
-                    tag = container_type,
-                    content = content
-                )
-            )
-        }
-    }
-}
+mod tests;

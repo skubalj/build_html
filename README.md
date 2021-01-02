@@ -26,18 +26,15 @@ parameters (such as `id` or `class` attributes) can be added as a `HashMap`. I r
 ```rust
 use html_gen::*;
 use maplit::hashmap;
-
 let html: String = HtmlPage::new()
     .add_title("My Page")
-    .add_header(1, "Main Content:", None)
+    .add_header(1, "Main Content:")
     .add_container(
         Container::new(ContainerType::Article, Some(hashmap! {"id" => "art1"}))
-            .add_header(2, "Hello, World", Some(hashmap! {"id" => "article-head"}))
-            .add_paragraph("This is a simple HTML demo", None)
+            .add_header_attr(2, "Hello, World", hashmap! {"id" => "article-head"})
+            .add_paragraph("This is a simple HTML demo")
     )
     .to_html_string();
-   
-println!("{}", html);
 ```
 
 produces a string equivalent to:
@@ -71,4 +68,5 @@ This project was made possible thanks to the following great projects:
 This project is licensed under the [MIT license](https://mit-license.org). In other words, it's
 free for you to use for whatever purpose you want. However, to the maximum extent allowed under the
 law, this software has NO WARRANTY.
+
 Copyright (C) 2020 Joseph Skubal
