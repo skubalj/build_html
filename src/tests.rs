@@ -1,5 +1,5 @@
 //! This module contains tests for the `lib.rs` file.
-//! 
+//!
 //! Tests were moved to their own file, as the `lib.rs` file grew to be very large
 
 use super::*;
@@ -42,7 +42,7 @@ mod container {
         );
 
         // Act
-        let sut = Container::new(container_type, None)
+        let sut = Container::new(container_type)
             .add_header_attr(1, "header", hashmap! {"id" => "main-header"})
             .add_image("myimage.png", "test image")
             .add_link("rust-lang.org", "Rust Home")
@@ -73,7 +73,7 @@ mod container {
         );
 
         // Act
-        let sut = Container::new(container_type, None)
+        let sut = Container::new(container_type)
             .add_header_attr(1, "header", hashmap! {"id" => "main-header"})
             .add_image("myimage.png", "test image")
             .add_link("rust-lang.org", "Rust Home")

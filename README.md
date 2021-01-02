@@ -30,7 +30,8 @@ let html: String = HtmlPage::new()
     .add_title("My Page")
     .add_header(1, "Main Content:")
     .add_container(
-        Container::new(ContainerType::Article, Some(hashmap! {"id" => "art1"}))
+        Container::new(ContainerType::Article)
+            .with_attributes(hashmap! {"id" => "article1"})
             .add_header_attr(2, "Hello, World", hashmap! {"id" => "article-head"})
             .add_paragraph("This is a simple HTML demo")
     )
@@ -47,7 +48,7 @@ produces a string equivalent to:
     </head>
     <body>
         <h1>Main Content:</h1>
-        <article id="art1">
+        <article id="article1">
             <h2 id="article-head">Hello World</h2>
             <p>This is a simple HTML demo</p>
         </article>

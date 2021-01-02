@@ -11,7 +11,8 @@
 //!     .add_title("My Page")
 //!     .add_header(1, "Main Content:")
 //!     .add_container(
-//!         Container::new(ContainerType::Article, Some(hashmap! {"id" => "art1"}))
+//!         Container::new(ContainerType::Article)
+//!             .with_attributes(hashmap! {"id" => "article1"})
 //!             .add_header_attr(2, "Hello, World", hashmap! {"id" => "article-head"})
 //!             .add_paragraph("This is a simple HTML demo")
 //!     )
@@ -28,7 +29,7 @@
 //!     </head>
 //!     <body>
 //!         <h1>Main Content:</h1>
-//!         <article id="art1">
+//!         <article id="article1">
 //!             <h2 id="article-head">Hello World</h2>
 //!             <p>This is a simple HTML demo</p>
 //!         </article>
@@ -44,6 +45,8 @@ use std::fmt::{self, Display};
 
 mod attributes;
 mod content;
+#[cfg(test)]
+mod tests;
 
 /// An element that can be converted to HTML
 pub trait Html: fmt::Debug {
@@ -136,7 +139,7 @@ pub trait HtmlContainer: Html + Sized {
     ///     .to_html_string();
     ///
     /// assert_eq!(
-    ///     content, 
+    ///     content,
     ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"></div>"#
     /// )
     /// ```
@@ -180,7 +183,7 @@ pub trait HtmlContainer: Html + Sized {
     ///     .to_html_string();
     ///
     /// assert_eq!(
-    ///     content, 
+    ///     content,
     ///     r#"<div><a href="https://rust-lang.org/" class="links">Rust Homepage</a></div>"#
     /// )
     /// ```
@@ -466,20 +469,38 @@ impl HtmlContainer for Container {
 
 impl Default for Container {
     fn default() -> Self {
-        Container::new(ContainerType::Div, None)
+        Container::new(ContainerType::Div)
     }
 }
 
 impl Container {
     /// Creates a new container with the specified tag.
-    pub fn new(tag: ContainerType, attributes: Option<HashMap<&str, &str>>) -> Self {
+    pub fn new(tag: ContainerType) -> Self {
         Container {
             tag,
             elements: Vec::new(),
-            attr: attributes.map(Attributes::from).unwrap_or_default(),
+            attr: Attributes::default(),
         }
     }
-}
 
-#[cfg(test)]
-mod tests;
+    /// Associates the specified map of attributes with this Container.
+    ///
+    /// Note that this operation overrides all previous `with_attribute` calls on
+    /// this `Container`
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// # use maplit::hashmap;
+    /// let container = Container::default()
+    ///     .with_attributes(hashmap! {"class" => "defaults"})
+    ///     .add_paragraph("text")
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(container, r#"<div class="defaults"><p>text</p></div>"#)
+    /// ```
+    pub fn with_attributes(mut self, attributes: HashMap<&str, &str>) -> Self {
+        self.attr = Attributes::from(attributes);
+        self
+    }
+}
