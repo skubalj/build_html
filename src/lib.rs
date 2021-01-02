@@ -1,5 +1,5 @@
 //! This library is designed to provide a simple way to generate HTML documents dynamically from
-//! within Rust code. To generate documents, this library uses the decorator pattern,
+//! within Rust code. To generate documents, this library uses the builder pattern,
 //!
 //! # Example
 //!

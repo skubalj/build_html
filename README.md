@@ -15,7 +15,7 @@ To use this crate, simply use the import:
 use html_gen::*;
 ```
 
-This project was created with the decorator pattern in mind. To create an HTML document, start with
+This project was created with the builder pattern in mind. To create an HTML document, start with
 an `HttpPage`, and build up the document with chained method calls. Once the document is built up,
 convert it to a `String` using `to_html_string()`. 
 
