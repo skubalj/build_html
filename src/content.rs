@@ -16,6 +16,9 @@ pub enum HeadContent {
         rel: String,
         attr: Attributes,
     },
+    Meta {
+        attr: Attributes,
+    },
     Style {
         css: String,
         attr: Attributes,
@@ -31,6 +34,7 @@ impl Html for HeadContent {
             HeadContent::Link { href, rel, attr } => {
                 format!(r#"<link href="{}" rel="{}"{}>"#, href, rel, attr)
             }
+            HeadContent::Meta { attr } => format!("<meta{}>", attr),
             HeadContent::Style { css, attr } => format!("<style{}>{}</style>", attr, css),
             HeadContent::Title { content } => format!("<title>{}</title>", content),
         }

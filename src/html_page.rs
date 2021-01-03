@@ -9,8 +9,6 @@ use std::fmt::{self, Display};
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
 ///
-/// This creates an effect similar to the [Decorator Pattern](https://en.wikipedia.org/wiki/Decorator_pattern)
-///
 /// To convert an `HtmlPage` to a [`String`] which can be sent back to a client, use the
 /// [`Html::to_html_string()`] method
 ///
@@ -21,6 +19,11 @@ use std::fmt::{self, Display};
 ///     .add_title("My Page")
 ///     .add_header(1, "Header Text")
 ///     .to_html_string();
+/// 
+/// assert_eq!(
+///     page,
+///     "<!DOCTYPE html><html><head><title>My Page</title></head><body><h1>Header Text</h1></body></html>"
+/// )
 /// ```
 #[derive(Debug)]
 pub struct HtmlPage {
@@ -85,7 +88,10 @@ impl HtmlPage {
     ///     .add_title("My Page")
     ///     .to_html_string();
     ///
-    /// assert_eq!(page, "<!DOCTYPE html><html><head><title>My Page</title></head><body></body></html>")
+    /// assert_eq!(
+    ///     page,
+    ///     "<!DOCTYPE html><html><head><title>My Page</title></head><body></body></html>"
+    /// );
     /// ```
     pub fn add_title(mut self, title_text: &str) -> Self {
         let title = HeadContent::Title {
@@ -95,7 +101,33 @@ impl HtmlPage {
         self
     }
 
-    /// Adds a style to this HTML page
+    /// Adds the specified metadata elements to this `HtmlPage`
+    ///
+    /// Attributes are specified in a `HashMap`
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// use maplit::hashmap;
+    ///
+    /// let page = HtmlPage::new()
+    ///     .add_meta(hashmap! {"charset" => "utf-8"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     page,
+    ///     r#"<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>"#
+    /// );
+    /// ```
+    pub fn add_meta(mut self, attributes: HashMap<&str, &str>) -> Self {
+        let meta = HeadContent::Meta {
+            attr: Attributes::from(attributes),
+        };
+        self.head.push(Box::new(meta));
+        self
+    }
+
+    /// Adds raw style data to this `HtmlPage`
     pub fn add_style(mut self, css: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
         let style = HeadContent::Style {
             css: css.into(),
@@ -105,19 +137,76 @@ impl HtmlPage {
         self
     }
 
+    /// Adds the specified stylesheet to the HTML head.
+    ///
+    /// This method uses [`add_head_link`](HtmlPage::add_head_link) internally
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let page = HtmlPage::new()
+    ///     .add_stylesheet("print.css")
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     page,
+    ///     r#"<!DOCTYPE html><html><head><link href="print.css" rel="stylesheet"></head><body></body></html>"#
+    /// )
+    /// ```
+    pub fn add_stylesheet(self, source: &str) -> Self {
+        self.add_head_link(source, "stylesheet")
+    }
+
     /// Adds a new link to the HTML head.
     ///
-    /// This is how to link a stylesheet into the document
-    pub fn add_head_link(
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let page = HtmlPage::new()
+    ///     .add_head_link("favicon.ico", "icon")
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     page,
+    ///     r#"<!DOCTYPE html><html><head><link href="favicon.ico" rel="icon"></head><body></body></html>"#
+    /// )
+    /// ```
+    pub fn add_head_link(mut self, href: &str, rel: &str) -> Self {
+        let link = HeadContent::Link {
+            href: href.into(),
+            rel: rel.into(),
+            attr: Attributes::default(),
+        };
+        self.head.push(Box::new(link));
+        self
+    }
+
+    /// Adds a new link to the HTML head with the specified additional attributes
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// use maplit::hashmap;
+    ///
+    /// let page = HtmlPage::new()
+    ///     .add_head_link_attr("print.css", "stylesheet", hashmap! {"media" => "print"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     page,
+    ///     r#"<!DOCTYPE html><html><head><link href="print.css" rel="stylesheet" media="print"></head><body></body></html>"#
+    /// )
+    /// ```
+    pub fn add_head_link_attr(
         mut self,
         href: &str,
         rel: &str,
-        attributes: Option<HashMap<&str, &str>>,
+        attributes: HashMap<&str, &str>,
     ) -> Self {
         let link = HeadContent::Link {
             href: href.into(),
             rel: rel.into(),
-            attr: attributes.map(Attributes::from).unwrap_or_default(),
+            attr: Attributes::from(attributes),
         };
         self.head.push(Box::new(link));
         self
