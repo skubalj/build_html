@@ -1,3 +1,5 @@
+//! This module contains the `HtmlPage` struct, which serves as the major entry point for the program
+
 use crate::attributes::Attributes;
 use crate::content::HeadContent;
 use crate::html_container::HtmlContainer;

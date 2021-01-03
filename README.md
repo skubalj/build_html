@@ -10,9 +10,15 @@ I see this crate being useful for outputting HTML reports of an operation, or fo
 HTML content from a web server.
 
 ## Use
-To use this crate, simply use the import: 
+Everything you need to use this crate has been exported from the crate root. This means that
+you can get easy access to every element using the import: `use html_gen::*`.
+
+If compatibility is important, or you don't need access to every element, you can also use the
+import `use html_gen;` and prefix types with the package name: 
 ```rust
-use html_gen::*;
+use html_gen;
+
+let page = html_gen::HtmlPage::new();
 ```
 
 This project was created with the builder pattern in mind. To create an HTML document, start with

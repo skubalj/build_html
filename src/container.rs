@@ -1,3 +1,5 @@
+//! This module contains information about containers and container types
+
 use crate::attributes::Attributes;
 use crate::html_container::HtmlContainer;
 use crate::Html;
