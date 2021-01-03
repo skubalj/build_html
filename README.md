@@ -26,6 +26,7 @@ parameters (such as `id` or `class` attributes) can be added as a `HashMap`. I r
 ```rust
 use html_gen::*;
 use maplit::hashmap;
+
 let html: String = HtmlPage::new()
     .add_title("My Page")
     .add_header(1, "Main Content:")
