@@ -41,8 +41,27 @@ impl Display for ContainerType {
 /// that the elements added will be converted to HTML strings in the same order as they were
 /// added.
 ///
-/// Supported container types are provided by the [`ContainerType`] enum. This struct is what
-/// allows Lists (`<ol>` / `<ul>`) as well as `<div>`s to be added to the `HtmlPage`
+/// Supported container types are provided by the [`ContainerType`] enum.
+///
+/// Note that `Container` elements can be nested inside of each other.
+/// ```rust
+/// # use html_gen::*;
+/// let text = Container::new(ContainerType::Main)
+///     .add_header(1, "My Container")
+///     .add_container(
+///         Container::new(ContainerType::Article)
+///             .add_container(
+///                 Container::new(ContainerType::Div)
+///                     .add_paragraph("Inner Text")
+///             )
+///     )
+///     .to_html_string();
+///
+/// assert_eq!(
+///     text,
+///     "<main><h1>My Container</h1><article><div><p>Inner Text</p></div></article></main>"
+/// );
+/// ```
 #[derive(Debug)]
 pub struct Container {
     tag: ContainerType,
@@ -128,7 +147,7 @@ mod tests {
     #[test_case(ContainerType::Article; "article")]
     #[test_case(ContainerType::Div; "div")]
     #[test_case(ContainerType::Main; "main")]
-    fn test_nesting(container_type: ContainerType) {
+    fn test_content(container_type: ContainerType) {
         // Expected
         let content = concat!(
             r#"<h1 id="main-header">header</h1>"#,
@@ -184,6 +203,32 @@ mod tests {
                 "<{tag}>{content}</{tag}>",
                 tag = container_type,
                 content = content
+            )
+        )
+    }
+
+    #[test]
+    fn test_nesting() {
+        // Act
+        let container = Container::new(ContainerType::Main)
+            .add_paragraph("paragraph")
+            .add_container(
+                Container::new(ContainerType::OrderedList)
+                    .add_container(Container::default().add_paragraph("1"))
+                    .add_container(Container::default().add_paragraph("2"))
+                    .add_container(Container::default().add_paragraph("3")),
+            )
+            .add_paragraph("done");
+
+        // Assert
+        assert_eq!(
+            container.to_html_string(),
+            concat!(
+                "<main><p>paragraph</p><ol>",
+                "<li><div><p>1</p></div></li>",
+                "<li><div><p>2</p></div></li>",
+                "<li><div><p>3</p></div></li>",
+                "</ol><p>done</p></main>"
             )
         )
     }
