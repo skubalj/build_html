@@ -26,11 +26,11 @@ pub enum ContainerType {
 impl Display for ContainerType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ContainerType::Article => write!(f, "article"),
-            ContainerType::Div => write!(f, "div"),
-            ContainerType::Main => write!(f, "main"),
-            ContainerType::OrderedList => write!(f, "ol"),
-            ContainerType::UnorderedList => write!(f, "ul"),
+            Self::Article => write!(f, "article"),
+            Self::Div => write!(f, "div"),
+            Self::Main => write!(f, "main"),
+            Self::OrderedList => write!(f, "ol"),
+            Self::UnorderedList => write!(f, "ul"),
         }
     }
 }

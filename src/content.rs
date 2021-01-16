@@ -11,32 +11,35 @@ use crate::Html;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum HeadContent {
+    /// A head `<link>` element used to link to things such as stylesheets
     Link {
         href: String,
         rel: String,
         attr: Attributes,
     },
-    Meta {
-        attr: Attributes,
-    },
-    Style {
-        css: String,
-        attr: Attributes,
-    },
-    Title {
-        content: String,
-    },
+    /// A head `<meta>` element used to add metadata to the document
+    Meta { attr: Attributes },
+    /// A head `<script>` element that references a link to a remote script
+    ScriptLink { src: String, attr: Attributes },
+    /// A head `<script>` element that contains literal code
+    ScriptLiteral { code: String },
+    /// A head `<style>` element used to specify literal styles
+    Style { css: String, attr: Attributes },
+    /// A `<title>` element used to set the document title
+    Title { content: String },
 }
 
 impl Html for HeadContent {
     fn to_html_string(&self) -> String {
         match self {
-            HeadContent::Link { href, rel, attr } => {
+            Self::Link { href, rel, attr } => {
                 format!(r#"<link href="{}" rel="{}"{}>"#, href, rel, attr)
             }
-            HeadContent::Meta { attr } => format!("<meta{}>", attr),
-            HeadContent::Style { css, attr } => format!("<style{}>{}</style>", attr, css),
-            HeadContent::Title { content } => format!("<title>{}</title>", content),
+            Self::Meta { attr } => format!("<meta{}>", attr),
+            Self::ScriptLink { src, attr } => format!(r#"<script src="{}"{}></script>"#, src, attr),
+            Self::ScriptLiteral { code } => format!("<script>{}</script>", code),
+            Self::Style { css, attr } => format!("<style{}>{}</style>", attr, css),
+            Self::Title { content } => format!("<title>{}</title>", content),
         }
     }
 }

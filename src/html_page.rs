@@ -19,15 +19,15 @@ use std::fmt::{self, Display};
 ///     .add_title("My Page")
 ///     .add_header(1, "Header Text")
 ///     .to_html_string();
-/// 
-/// assert_eq!(
-///     page,
-///     "<!DOCTYPE html><html><head><title>My Page</title></head><body><h1>Header Text</h1></body></html>"
-/// )
+///
+/// assert_eq!(page, concat!(
+///     "<!DOCTYPE html><html><head><title>My Page</title></head>",
+///     "<body><h1>Header Text</h1></body></html>"
+/// ));
 /// ```
 #[derive(Debug)]
 pub struct HtmlPage {
-    head: Vec<Box<dyn Html>>,
+    head: Vec<HeadContent>,
     body: Vec<Box<dyn Html>>,
 }
 
@@ -70,6 +70,12 @@ impl Display for HtmlPage {
     }
 }
 
+impl From<HtmlPage> for String {
+    fn from(html: HtmlPage) -> Self {
+        html.to_html_string()
+    }
+}
+
 impl HtmlPage {
     /// Creates a new HTML page with no content
     pub fn new() -> Self {
@@ -79,25 +85,60 @@ impl HtmlPage {
         }
     }
 
-    /// Adds a title to this HTML page
+    /// Adds a new link to the HTML head.
     ///
     /// # Example
     /// ```
     /// # use html_gen::*;
     /// let page = HtmlPage::new()
-    ///     .add_title("My Page")
+    ///     .add_head_link("favicon.ico", "icon")
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     page,
-    ///     "<!DOCTYPE html><html><head><title>My Page</title></head><body></body></html>"
-    /// );
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<link href="favicon.ico" rel="icon">"#,
+    ///     "</head><body></body></html>"
+    /// ));
     /// ```
-    pub fn add_title(mut self, title_text: &str) -> Self {
-        let title = HeadContent::Title {
-            content: title_text.into(),
+    pub fn add_head_link(mut self, href: &str, rel: &str) -> Self {
+        let link = HeadContent::Link {
+            href: href.into(),
+            rel: rel.into(),
+            attr: Attributes::default(),
         };
-        self.head.push(Box::new(title));
+        self.head.push(link);
+        self
+    }
+
+    /// Adds a new link to the HTML head with the specified additional attributes
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// use maplit::hashmap;
+    ///
+    /// let page = HtmlPage::new()
+    ///     .add_head_link_attr("print.css", "stylesheet", hashmap! {"media" => "print"})
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<link href="print.css" rel="stylesheet" media="print">"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_head_link_attr(
+        mut self,
+        href: &str,
+        rel: &str,
+        attributes: HashMap<&str, &str>,
+    ) -> Self {
+        let link = HeadContent::Link {
+            href: href.into(),
+            rel: rel.into(),
+            attr: Attributes::from(attributes),
+        };
+        self.head.push(link);
         self
     }
 
@@ -114,26 +155,124 @@ impl HtmlPage {
     ///     .add_meta(hashmap! {"charset" => "utf-8"})
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     page,
-    ///     r#"<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>"#
-    /// );
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<meta charset="utf-8">"#,
+    ///     "</head><body></body></html>"
+    /// ));
     /// ```
     pub fn add_meta(mut self, attributes: HashMap<&str, &str>) -> Self {
         let meta = HeadContent::Meta {
-            attr: Attributes::from(attributes),
+            attr: attributes.into(),
         };
-        self.head.push(Box::new(meta));
+        self.head.push(meta);
+        self
+    }
+
+    /// Adds the specified external script to the `HtmlPage`
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let page = HtmlPage::new()
+    ///     .add_script_link("myScript.js")
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<script src="myScript.js"></script>"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_script_link(mut self, src: &str) -> Self {
+        let script = HeadContent::ScriptLink {
+            src: src.into(),
+            attr: Attributes::default(),
+        };
+        self.head.push(script);
+        self
+    }
+
+    pub fn add_script_link_attr(mut self, src: &str, attributes: HashMap<&str, &str>) -> Self {
+        let script = HeadContent::ScriptLink {
+            src: src.into(),
+            attr: attributes.into(),
+        };
+        self.head.push(script);
+        self
+    }
+
+    /// Adds the specified script to this `HtmlPage`
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let page = HtmlPage::new()
+    ///     .add_script_literal(r#"window.onload = () => console.log("Hello World");"#)
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head><script>",
+    ///     r#"window.onload = () => console.log("Hello World");"#,
+    ///     "</script></head><body></body></html>"
+    /// ));
+    /// ```
+    ///
+    /// In order to lint the code, it can be helpful to define your script in
+    /// its own file. That file can be inserted into the html page using the
+    /// [`include_str`] macro:
+    ///
+    /// ```ignore (cannot-doctest-external-file-dependency)
+    /// let page = HtmlPage::new()
+    ///     .add_script_literal(include_str!("myScript.js"))
+    ///     .to_html_string();
+    /// ```
+    pub fn add_script_literal(mut self, code: &str) -> Self {
+        let script = HeadContent::ScriptLiteral { code: code.into() };
+        self.head.push(script);
         self
     }
 
     /// Adds raw style data to this `HtmlPage`
-    pub fn add_style(mut self, css: &str, attributes: Option<HashMap<&str, &str>>) -> Self {
+    ///
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let page = HtmlPage::new()
+    ///     .add_style(r#"p{font-family:"Liberation Serif";}"#)
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<style>p{font-family:"Liberation Serif";}</style>"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    ///
+    /// To allow for linting, it can be helpful to define CSS in its own file.
+    /// That file can be included at compile time using the [`include_str`] macro:
+    ///
+    /// ```ignore (cannot-doctest-external-file-dependency)
+    /// let page = HtmlPage::new()
+    ///     .add_style(include_str!("styles.css"))
+    ///     .to_html_string();
+    /// ```
+    pub fn add_style(mut self, css: &str) -> Self {
         let style = HeadContent::Style {
             css: css.into(),
-            attr: attributes.map(Attributes::from).unwrap_or_default(),
+            attr: Attributes::default(),
         };
-        self.head.push(Box::new(style));
+        self.head.push(style);
+        self
+    }
+
+    /// Adds the specified style with the
+    pub fn add_style_attr(mut self, css: &str, attributes: HashMap<&str, &str>) -> Self {
+        let style = HeadContent::Style {
+            css: css.into(),
+            attr: attributes.into(),
+        };
+        self.head.push(style);
         self
     }
 
@@ -148,67 +287,36 @@ impl HtmlPage {
     ///     .add_stylesheet("print.css")
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     page,
-    ///     r#"<!DOCTYPE html><html><head><link href="print.css" rel="stylesheet"></head><body></body></html>"#
-    /// )
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<link href="print.css" rel="stylesheet">"#,
+    ///     "</head><body></body></html>"
+    /// ));
     /// ```
     pub fn add_stylesheet(self, source: &str) -> Self {
         self.add_head_link(source, "stylesheet")
     }
 
-    /// Adds a new link to the HTML head.
+    /// Adds a title to this HTML page
     ///
     /// # Example
     /// ```
     /// # use html_gen::*;
     /// let page = HtmlPage::new()
-    ///     .add_head_link("favicon.ico", "icon")
+    ///     .add_title("My Page")
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     page,
-    ///     r#"<!DOCTYPE html><html><head><link href="favicon.ico" rel="icon"></head><body></body></html>"#
-    /// )
+    /// assert_eq!(page, concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     "<title>My Page</title>",
+    ///     "</head><body></body></html>"
+    /// ));
     /// ```
-    pub fn add_head_link(mut self, href: &str, rel: &str) -> Self {
-        let link = HeadContent::Link {
-            href: href.into(),
-            rel: rel.into(),
-            attr: Attributes::default(),
+    pub fn add_title(mut self, title_text: &str) -> Self {
+        let title = HeadContent::Title {
+            content: title_text.into(),
         };
-        self.head.push(Box::new(link));
-        self
-    }
-
-    /// Adds a new link to the HTML head with the specified additional attributes
-    ///
-    /// # Example
-    /// ```
-    /// # use html_gen::*;
-    /// use maplit::hashmap;
-    ///
-    /// let page = HtmlPage::new()
-    ///     .add_head_link_attr("print.css", "stylesheet", hashmap! {"media" => "print"})
-    ///     .to_html_string();
-    ///
-    /// assert_eq!(
-    ///     page,
-    ///     r#"<!DOCTYPE html><html><head><link href="print.css" rel="stylesheet" media="print"></head><body></body></html>"#
-    /// )
-    /// ```
-    pub fn add_head_link_attr(
-        mut self,
-        href: &str,
-        rel: &str,
-        attributes: HashMap<&str, &str>,
-    ) -> Self {
-        let link = HeadContent::Link {
-            href: href.into(),
-            rel: rel.into(),
-            attr: Attributes::from(attributes),
-        };
-        self.head.push(Box::new(link));
+        self.head.push(title);
         self
     }
 }
