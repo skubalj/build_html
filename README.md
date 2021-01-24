@@ -3,8 +3,6 @@
 html-gen: Rust HTML Generation
 ==============================
 
-> THIS PROJECT IS STILL UNDER HEAVY DEVELOPMENT
-
 This project is a library for generating HTML code. It was conceived due to the lack of a simple 
 way to dynamically create an HTML document from within Rust. 
 

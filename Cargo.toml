@@ -3,6 +3,11 @@ name = "html_gen"
 version = "0.1.0"
 authors = ["Joseph Skubal"]
 edition = "2018"
+repository  = "https://gitlab.com/skubalj/html-gen"
+description = "Library for basic server-side rendering written in pure rust"
+readme = "README.md"
+license-file = "LICENSE"
+keywords = ["HTML", "web"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
