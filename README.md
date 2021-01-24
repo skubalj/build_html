@@ -6,7 +6,7 @@ html-gen: Rust HTML Generation
 This crate allows HTML strings to be generated from within Rust code using the Builder pattern.
 In general, this library will attempt to create a 'minimal' version of the HTML; tags are 
 concatinated without additional spaces being added. For this reason, this library may not be
-optimial for use in applications intending to display the raw HTML. 
+optimal for use in applications intending to display the raw HTML. 
 
 The main application for this crate, and its impetus, is providing simple server-side rendering 
 for a web application. However, it could also be used to generate HTML reports from within other
