@@ -1,5 +1,5 @@
 //! This module contains the implementations used to add HTML tables to this library
-//! 
+//!
 //! Tables are provided using the `Table` struct, and are loaded from 1 and 2D data
 //! structures which implement the `IntoIterator` struct
 
@@ -75,6 +75,12 @@ impl Html for Table {
     }
 }
 
+impl Default for Table {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> From<T> for Table
 where
     T: IntoIterator,
@@ -127,19 +133,19 @@ impl Table {
         self
     }
 
-    /// Adds the specified row to the table header 
-    /// 
+    /// Adds the specified row to the table header
+    ///
     /// Note that no checking is done to ensure that the row is of the proper length
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use html_gen::*;
     /// let table = Table::new()
     ///     .add_header_row(vec!["Mon", "Tues", "Wed", "Thurs", "Fri"])
     ///     .to_html_string();
-    /// 
+    ///
     /// assert_eq!(
-    ///     table, 
+    ///     table,
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
@@ -156,19 +162,19 @@ impl Table {
         self
     }
 
-    /// Adds the specified row to the table body 
-    /// 
+    /// Adds the specified row to the table body
+    ///
     /// Note that no checking is done to ensure that the row is of the proper length
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use html_gen::*;
     /// let table = Table::new()
     ///     .add_body_row(vec![1, 2, 3, 4, 5])
     ///     .to_html_string();
-    /// 
+    ///
     /// assert_eq!(
-    ///     table, 
+    ///     table,
     ///     concat!(
     ///         "<table><thead></thead><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
