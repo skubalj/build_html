@@ -7,8 +7,8 @@
 //! Everything you need to use this crate has been exported from the crate root. This means that
 //! you can get easy access to every element using the import: `use build_html::*`.
 //!
-//! If compatibility is important, or you don't need access to every element, you can also use the
-//! import `use build_html;` and prefix types with the package name. Note that the traits `HTML` and 
+//! If compatibility is important, or you don't need access to every element, you can also import
+//! elements piecemeal and prefix types with the package name. Note that the traits `HTML` and
 //! `HtmlContainer` must be in scope for the library to be useful:
 //! ```
 //! use build_html::{self, Html, HtmlContainer};
@@ -79,8 +79,7 @@ pub use self::table::Table;
 ///
 /// This trait is the centerpiece of the entire library: after building up an
 /// HTML structure, usually an [`HtmlPage`], [`to_html_string()`](crate::Html::to_html_string)
-/// is used to flush the structure to a string. This works by iterating through all
-/// the elements inside each Html element, and converting each
+/// is used to flush the structure to a string.
 pub trait Html: std::fmt::Debug {
     /// Convert this element into an HTML string
     ///

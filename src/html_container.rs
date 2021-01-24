@@ -14,13 +14,13 @@ use std::fmt::Display;
 /// to add only one method: [`add_html()`](crate::HtmlContainer::add_html)
 pub trait HtmlContainer: Html + Sized {
     /// Adds the specified HTML element to this container
-    /// 
-    /// This method should *probably* not be used directly by client programs. For most 
+    ///
+    /// This method should *probably* not be used directly by client programs. For most
     /// applications, the `add_x()` methods will provide more safety.
     fn add_html(self, html: Box<dyn Html>) -> Self;
 
     /// Nest the specified container within this container
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use build_html::*;
@@ -31,9 +31,9 @@ pub trait HtmlContainer: Html + Sized {
     ///             .add_paragraph("Content Inside")
     ///     )
     ///     .to_html_string();
-    /// 
+    ///
     /// assert_eq!(
-    ///     content, 
+    ///     content,
     ///     "<div><h1>Content Outside</h1><main><p>Content Inside</p></main></div>"
     /// );
     /// ```
@@ -42,7 +42,7 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Nest the specified `Table` within this container
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use build_html::*;
@@ -55,9 +55,9 @@ pub trait HtmlContainer: Html + Sized {
     ///         .add_header_row(&['A', 'B', 'C'])
     ///     )
     ///     .to_html_string();
-    /// 
+    ///
     /// assert_eq!(
-    ///     content, 
+    ///     content,
     ///     concat!(
     ///         "<div><table><thead>",
     ///         "<tr><th>A</th><th>B</th><th>C</th></tr>",
