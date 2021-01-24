@@ -64,11 +64,13 @@ mod container;
 mod content;
 mod html_container;
 mod html_page;
+mod table;
 
 // Exports for the `use html_gen::*` syntax
 pub use self::container::{Container, ContainerType};
 pub use self::html_container::HtmlContainer;
 pub use self::html_page::HtmlPage;
+pub use self::table::Table;
 
 /// An element that can be converted to an HTML string
 ///
@@ -91,4 +93,10 @@ pub trait Html: std::fmt::Debug {
     /// assert_eq!(html, "<div><p>My p element</p></div>")
     /// ```
     fn to_html_string(&self) -> String;
+}
+
+impl std::fmt::Display for dyn Html {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.to_html_string())
+    }
 }
