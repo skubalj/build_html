@@ -3,27 +3,36 @@
 html-gen: Rust HTML Generation
 ==============================
 
-This project is a library for generating HTML code. It was conceived due to the lack of a simple 
-way to dynamically create an HTML document from within Rust. 
+This crate allows HTML strings to be generated from within Rust code using the Builder pattern.
+In general, this library will attempt to create a 'minimal' version of the HTML; tags are 
+concatinated without additional spaces being added. For this reason, this library may not be
+optimial for use in applications intending to display the raw HTML. 
 
-I see this crate being useful for outputting HTML reports of an operation, or for providing simple
-HTML content from a web server.
+The main application for this crate, and its impetus, is providing simple server-side rendering 
+for a web application. However, it could also be used to generate HTML reports from within other
+applications.
+
+This crate is written in purely safe Rust with no production dependencies.
 
 ## Use
 Everything you need to use this crate has been exported from the crate root. This means that
 you can get easy access to every element using the import: `use html_gen::*`.
 
-If compatibility is important, or you don't need access to every element, you can also use the
-import `use html_gen;` and prefix types with the package name: 
+If compatibility is important, or you don't need access to every element, you can also import 
+piecemeal and prefix types with the package name. Note that the traits `Html` and 
+`HtmlContainer` must be exported for the library to be useful: 
 ```rust
-use html_gen;
+use html_gen::{self, Html, HtmlContainer};
 
-let page = html_gen::HtmlPage::new();
+let page = html_gen::HtmlPage::new()
+    .add_paragraph("Some Text")
+    .to_html_string();
 ```
 
 This project was created with the builder pattern in mind. To create an HTML document, start with
-an `HttpPage`, and build up the document with chained method calls. Once the document is built up,
-convert it to a `String` using `to_html_string()`. 
+an `HtmlPage`, and build up the document with chained method calls. Once the document is built up,
+convert it to a `String` using `to_html_string()`. The `Display` trait is also implemented for all
+`Html` elements, meaning these elements can be converted into HTML using `format!()` as well.
 
 While adding content, required attributes are specified as method parameters. Additional optional
 parameters (such as `id` or `class` attributes) can be added as a `HashMap`. I recommend using the
@@ -62,6 +71,29 @@ produces a string equivalent to:
     </body>
 </html>
 ```
+
+## Supported Features
+This library does not intend to support *all* tags and features from the HTML specification.
+However, an effort has been made to provide the most common features for a majority of use cases.
+
+Currently, this library supports adding the following HTML features / tags:
+
+### Body Elements
+* Containers (`<article>`, `<div>`, `<main>`)
+* Headers (`<h1>`, `<h2>`, `<h3>`, ... )
+* Images (`<img>`)
+* Links (`<a>`)
+* Lists (`<li>`, `<ol>`)
+* Paragraphs (`<p>`)
+* Preformatted Text (`<pre>`)
+* Tables (`<table>`)
+
+### Header Elements
+* Links (`<link>`)
+* Meta (`<meta>`)
+* Scripts (`<script>`)
+* Style (`<style>`)
+* Title (`<title>`)
 
 ## Acknowledgment
 Special thanks to Sean McArthur; the way that filters work in [warp](https://crates.io/crates/warp)

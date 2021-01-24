@@ -8,11 +8,14 @@
 //! you can get easy access to every element using the import: `use html_gen::*`.
 //!
 //! If compatibility is important, or you don't need access to every element, you can also use the
-//! import `use html_gen;` and prefix types with the package name:
+//! import `use html_gen;` and prefix types with the package name. Note that the traits `HTML` and 
+//! `HtmlContainer` must be in scope for the library to be useful:
 //! ```
-//! use html_gen;
+//! use html_gen::{self, Html, HtmlContainer};
 //!
-//! let page = html_gen::HtmlPage::new();
+//! let page = html_gen::HtmlPage::new()
+//!     .add_paragraph("Some Text")
+//!     .to_html_string();
 //! ```
 //!
 //! Once the package is imported, the [`HtmlPage`] struct will provide the base for most use cases.
