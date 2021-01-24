@@ -14,14 +14,60 @@ use std::fmt::Display;
 /// to add only one method: [`add_html()`](crate::HtmlContainer::add_html)
 pub trait HtmlContainer: Html + Sized {
     /// Adds the specified HTML element to this container
+    /// 
+    /// This method should *probably* not be used directly by client programs. For most 
+    /// applications, the `add_x()` methods will provide more safety.
     fn add_html(self, html: Box<dyn Html>) -> Self;
 
     /// Nest the specified container within this container
+    /// 
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_header(1, "Content Outside")
+    ///     .add_container(
+    ///         Container::new(ContainerType::Main)
+    ///             .add_paragraph("Content Inside")
+    ///     )
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(
+    ///     content, 
+    ///     "<div><h1>Content Outside</h1><main><p>Content Inside</p></main></div>"
+    /// );
+    /// ```
     fn add_container(self, container: Container) -> Self {
         self.add_html(Box::new(container))
     }
 
     /// Nest the specified `Table` within this container
+    /// 
+    /// # Example
+    /// ```
+    /// # use html_gen::*;
+    /// let content = Container::default()
+    ///     .add_table(
+    ///         Table::from(&[
+    ///             [1, 2, 3],
+    ///             [4, 5, 6]
+    ///         ])
+    ///         .add_header_row(&['A', 'B', 'C'])
+    ///     )
+    ///     .to_html_string();
+    /// 
+    /// assert_eq!(
+    ///     content, 
+    ///     concat!(
+    ///         "<div><table><thead>",
+    ///         "<tr><th>A</th><th>B</th><th>C</th></tr>",
+    ///         "</thead><tbody>",
+    ///         "<tr><td>1</td><td>2</td><td>3</td></tr>",
+    ///         "<tr><td>4</td><td>5</td><td>6</td></tr>",
+    ///         "</tbody></table></div>"
+    ///     )
+    /// );
+    /// ```
     fn add_table(self, table: Table) -> Self {
         self.add_html(Box::new(table))
     }
