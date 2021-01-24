@@ -5,6 +5,7 @@ use crate::content::BodyContent;
 use crate::Container;
 use crate::Html;
 use std::collections::HashMap;
+use std::fmt::Display;
 
 /// An HTML element that can contain other HTML elements
 ///
@@ -30,10 +31,10 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><h1>Header Text</h1></div>"#)
     /// ```
-    fn add_header(self, level: u8, text: &str) -> Self {
+    fn add_header<T: Display>(self, level: u8, text: T) -> Self {
         let content = BodyContent::Header {
             level,
-            content: text.into(),
+            content: format!("{}", text),
             attr: Attributes::default(),
         };
         self.add_html(Box::new(content))
@@ -51,11 +52,11 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><h1 id="main-header">Header Text</h1></div>"#)
     /// ```
-    fn add_header_attr(self, level: u8, text: &str, attributes: HashMap<&str, &str>) -> Self {
+    fn add_header_attr<T: Display>(self, level: u8, text: T, attr: HashMap<&str, &str>) -> Self {
         let content = BodyContent::Header {
             level,
-            content: text.into(),
-            attr: Attributes::from(attributes),
+            content: format!("{}", text),
+            attr: attr.into(),
         };
         self.add_html(Box::new(content))
     }
@@ -95,11 +96,11 @@ pub trait HtmlContainer: Html + Sized {
     ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"></div>"#
     /// )
     /// ```
-    fn add_image_attr(self, src: &str, alt: &str, attributes: HashMap<&str, &str>) -> Self {
+    fn add_image_attr(self, src: &str, alt: &str, attr: HashMap<&str, &str>) -> Self {
         let content = BodyContent::Image {
             src: src.into(),
             alt: alt.into(),
-            attr: Attributes::from(attributes),
+            attr: attr.into(),
         };
         self.add_html(Box::new(content))
     }
@@ -115,10 +116,10 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><a href="https://rust-lang.org/">Rust Homepage</a></div>"#)
     /// ```
-    fn add_link(self, href: &str, text: &str) -> Self {
+    fn add_link<T: Display>(self, href: &str, text: T) -> Self {
         let content = BodyContent::Link {
             href: href.into(),
-            content: text.into(),
+            content: format!("{}", text),
             attr: Attributes::default(),
         };
         self.add_html(Box::new(content))
@@ -139,11 +140,11 @@ pub trait HtmlContainer: Html + Sized {
     ///     r#"<div><a href="https://rust-lang.org/" class="links">Rust Homepage</a></div>"#
     /// )
     /// ```
-    fn add_link_attr(self, href: &str, text: &str, attributes: HashMap<&str, &str>) -> Self {
+    fn add_link_attr<T: Display>(self, href: &str, text: T, attr: HashMap<&str, &str>) -> Self {
         let content = BodyContent::Link {
             href: href.into(),
-            content: text.into(),
-            attr: Attributes::from(attributes),
+            content: format!("{}", text),
+            attr: attr.into(),
         };
         self.add_html(Box::new(content))
     }
@@ -159,9 +160,9 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><p>This is sample paragraph text</p></div>"#)
     /// ```
-    fn add_paragraph(self, text: &str) -> Self {
+    fn add_paragraph<T: Display>(self, text: T) -> Self {
         let content = BodyContent::Paragraph {
-            content: text.into(),
+            content: format!("{}", text),
             attr: Attributes::default(),
         };
         self.add_html(Box::new(content))
@@ -179,10 +180,10 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><p class="text">This is sample paragraph text</p></div>"#)
     /// ```
-    fn add_paragraph_attr(self, text: &str, attributes: HashMap<&str, &str>) -> Self {
+    fn add_paragraph_attr<T: Display>(self, text: T, attr: HashMap<&str, &str>) -> Self {
         let content = BodyContent::Paragraph {
-            content: text.into(),
-            attr: Attributes::from(attributes),
+            content: format!("{}", text),
+            attr: attr.into(),
         };
         self.add_html(Box::new(content))
     }
@@ -198,9 +199,9 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><pre>This | is   preformatted => text</pre></div>"#)
     /// ```
-    fn add_preformatted(self, text: &str) -> Self {
+    fn add_preformatted<T: Display>(self, text: T) -> Self {
         let content = BodyContent::Preformatted {
-            content: text.into(),
+            content: format!("{}", text),
             attr: Attributes::default(),
         };
         self.add_html(Box::new(content))
@@ -218,10 +219,10 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><pre id="code">This | is   preformatted => text</pre></div>"#)
     /// ```
-    fn add_preformatted_attr(self, text: &str, attributes: HashMap<&str, &str>) -> Self {
+    fn add_preformatted_attr<T: Display>(self, text: T, attr: HashMap<&str, &str>) -> Self {
         let content = BodyContent::Preformatted {
-            content: text.into(),
-            attr: Attributes::from(attributes),
+            content: format!("{}", text),
+            attr: attr.into(),
         };
         self.add_html(Box::new(content))
     }

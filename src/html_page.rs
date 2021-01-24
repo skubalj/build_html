@@ -5,7 +5,6 @@ use crate::content::HeadContent;
 use crate::html_container::HtmlContainer;
 use crate::Html;
 use std::collections::HashMap;
-use std::fmt::{self, Display};
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
 ///
@@ -61,18 +60,6 @@ impl HtmlContainer for HtmlPage {
 impl Default for HtmlPage {
     fn default() -> Self {
         HtmlPage::new()
-    }
-}
-
-impl Display for HtmlPage {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.to_html_string())
-    }
-}
-
-impl From<HtmlPage> for String {
-    fn from(html: HtmlPage) -> Self {
-        html.to_html_string()
     }
 }
 

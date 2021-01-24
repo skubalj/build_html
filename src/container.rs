@@ -214,8 +214,8 @@ mod tests {
             .add_paragraph("paragraph")
             .add_container(
                 Container::new(ContainerType::OrderedList)
-                    .add_container(Container::default().add_paragraph("1"))
-                    .add_container(Container::default().add_paragraph("2"))
+                    .add_container(Container::default().add_paragraph(1))
+                    .add_container(Container::default().add_paragraph('2'))
                     .add_container(Container::default().add_paragraph("3")),
             )
             .add_paragraph("done");
