@@ -4,6 +4,7 @@ use crate::attributes::Attributes;
 use crate::content::BodyContent;
 use crate::Container;
 use crate::Html;
+use crate::Table;
 use std::collections::HashMap;
 use std::fmt::Display;
 
@@ -18,6 +19,11 @@ pub trait HtmlContainer: Html + Sized {
     /// Nest the specified container within this container
     fn add_container(self, container: Container) -> Self {
         self.add_html(Box::new(container))
+    }
+
+    /// Nest the specified `Table` within this container
+    fn add_table(self, table: Table) -> Self {
+        self.add_html(Box::new(table))
     }
 
     /// Adds a header tag with the designated level to this container
