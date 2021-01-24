@@ -34,7 +34,7 @@ where
 ///
 /// # Example
 /// ```
-/// # use html_gen::*;
+/// # use build_html::*;
 /// let source_table = [
 ///     [1, 2, 3],
 ///     [4, 5, 6],
@@ -117,7 +117,7 @@ impl Table {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let table = Table::new()
     ///     .with_attributes(hashmap! {"id" => "my-table"})
@@ -139,7 +139,7 @@ impl Table {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let table = Table::new()
     ///     .add_header_row(vec!["Mon", "Tues", "Wed", "Thurs", "Fri"])
     ///     .to_html_string();
@@ -168,7 +168,7 @@ impl Table {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let table = Table::new()
     ///     .add_body_row(vec![1, 2, 3, 4, 5])
     ///     .to_html_string();

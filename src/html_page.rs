@@ -13,7 +13,7 @@ use std::collections::HashMap;
 ///
 /// # Example
 /// ```
-/// # use html_gen::*;
+/// # use build_html::*;
 /// let page: String = HtmlPage::new()
 ///     .add_title("My Page")
 ///     .add_header(1, "Header Text")
@@ -76,7 +76,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
     ///     .add_head_link("favicon.ico", "icon")
     ///     .to_html_string();
@@ -101,7 +101,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// use maplit::hashmap;
     ///
     /// let page = HtmlPage::new()
@@ -135,7 +135,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// use maplit::hashmap;
     ///
     /// let page = HtmlPage::new()
@@ -160,7 +160,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
     ///     .add_script_link("myScript.js")
     ///     .to_html_string();
@@ -193,7 +193,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
     ///     .add_script_literal(r#"window.onload = () => console.log("Hello World");"#)
     ///     .to_html_string();
@@ -224,7 +224,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
     ///     .add_style(r#"p{font-family:"Liberation Serif";}"#)
     ///     .to_html_string();
@@ -269,7 +269,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
     ///     .add_stylesheet("print.css")
     ///     .to_html_string();
@@ -288,7 +288,7 @@ impl HtmlPage {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
     ///     .add_title("My Page")
     ///     .to_html_string();

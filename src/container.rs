@@ -45,7 +45,7 @@ impl Display for ContainerType {
 ///
 /// Note that `Container` elements can be nested inside of each other.
 /// ```rust
-/// # use html_gen::*;
+/// # use build_html::*;
 /// let text = Container::new(ContainerType::Main)
 ///     .add_header(1, "My Container")
 ///     .add_container(
@@ -123,7 +123,7 @@ impl Container {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let container = Container::default()
     ///     .with_attributes(hashmap! {"class" => "defaults"})

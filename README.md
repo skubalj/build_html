@@ -1,6 +1,6 @@
 [![pipeline status](https://gitlab.com/skubalj/html-gen/badges/master/pipeline.svg)](https://gitlab.com/skubalj/html-gen/-/commits/master)
 
-html-gen: Rust HTML Generation
+build_html: Rust HTML Generation
 ==============================
 
 This crate allows HTML strings to be generated from within Rust code using the Builder pattern.
@@ -16,15 +16,15 @@ This crate is written in purely safe Rust with no production dependencies.
 
 ## Use
 Everything you need to use this crate has been exported from the crate root. This means that
-you can get easy access to every element using the import: `use html_gen::*`.
+you can get easy access to every element using the import: `use build_html::*`.
 
 If compatibility is important, or you don't need access to every element, you can also import 
 piecemeal and prefix types with the package name. Note that the traits `Html` and 
 `HtmlContainer` must be exported for the library to be useful: 
 ```rust
-use html_gen::{self, Html, HtmlContainer};
+use build_html::{self, Html, HtmlContainer};
 
-let page = html_gen::HtmlPage::new()
+let page = build_html::HtmlPage::new()
     .add_paragraph("Some Text")
     .to_html_string();
 ```
@@ -39,7 +39,7 @@ parameters (such as `id` or `class` attributes) can be added as a `HashMap`. I r
 [`maplit`](https://crates.io/crates/maplit) library to create `HashMap` literals. 
 
 ```rust
-use html_gen::*;
+use build_html::*;
 use maplit::hashmap;
 
 let html: String = HtmlPage::new()

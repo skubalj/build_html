@@ -5,15 +5,15 @@
 //!
 //! # Using
 //! Everything you need to use this crate has been exported from the crate root. This means that
-//! you can get easy access to every element using the import: `use html_gen::*`.
+//! you can get easy access to every element using the import: `use build_html::*`.
 //!
 //! If compatibility is important, or you don't need access to every element, you can also use the
-//! import `use html_gen;` and prefix types with the package name. Note that the traits `HTML` and 
+//! import `use build_html;` and prefix types with the package name. Note that the traits `HTML` and 
 //! `HtmlContainer` must be in scope for the library to be useful:
 //! ```
-//! use html_gen::{self, Html, HtmlContainer};
+//! use build_html::{self, Html, HtmlContainer};
 //!
-//! let page = html_gen::HtmlPage::new()
+//! let page = build_html::HtmlPage::new()
 //!     .add_paragraph("Some Text")
 //!     .to_html_string();
 //! ```
@@ -28,7 +28,7 @@
 //! for its simplicity.
 //!
 //! ```rust
-//! use html_gen::*;
+//! use build_html::*;
 //! use maplit::hashmap;
 //!
 //! let html: String = HtmlPage::new()
@@ -69,7 +69,7 @@ mod html_container;
 mod html_page;
 mod table;
 
-// Exports for the `use html_gen::*` syntax
+// Exports for the `use build_html::*` syntax
 pub use self::container::{Container, ContainerType};
 pub use self::html_container::HtmlContainer;
 pub use self::html_page::HtmlPage;
@@ -88,7 +88,7 @@ pub trait Html: std::fmt::Debug {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let html = Container::default()
     ///     .add_paragraph("My p element")
     ///     .to_html_string();

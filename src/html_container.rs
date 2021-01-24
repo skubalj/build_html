@@ -23,7 +23,7 @@ pub trait HtmlContainer: Html + Sized {
     /// 
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_header(1, "Content Outside")
     ///     .add_container(
@@ -45,7 +45,7 @@ pub trait HtmlContainer: Html + Sized {
     /// 
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_table(
     ///         Table::from(&[
@@ -76,7 +76,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_header(1, "Header Text")
     ///     .to_html_string();
@@ -96,7 +96,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let content = Container::default()
     ///     .add_header_attr(1, "Header Text", hashmap! {"id" => "main-header"})
@@ -117,7 +117,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_image("myimage.png", "a test image")
     ///     .to_html_string();
@@ -137,7 +137,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let content = Container::default()
     ///     .add_image_attr("myimage.png", "a test image", hashmap! {"id" => "sample-image"})
@@ -161,7 +161,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_link("https://rust-lang.org/", "Rust Homepage")
     ///     .to_html_string();
@@ -181,7 +181,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let content = Container::default()
     ///     .add_link_attr("https://rust-lang.org/", "Rust Homepage", hashmap! {"class" => "links"})
@@ -205,7 +205,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_paragraph("This is sample paragraph text")
     ///     .to_html_string();
@@ -224,7 +224,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let content = Container::default()
     ///     .add_paragraph_attr("This is sample paragraph text", hashmap! {"class" => "text"})
@@ -244,7 +244,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// let content = Container::default()
     ///     .add_preformatted("This | is   preformatted => text")
     ///     .to_html_string();
@@ -263,7 +263,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// # Example
     /// ```
-    /// # use html_gen::*;
+    /// # use build_html::*;
     /// # use maplit::hashmap;
     /// let content = Container::default()
     ///     .add_preformatted_attr("This | is   preformatted => text", hashmap! {"id" => "code"})
