@@ -6,7 +6,7 @@ edition = "2018"
 repository  = "https://gitlab.com/skubalj/build-html"
 description = "Library for basic server-side rendering written in pure rust"
 readme = "README.md"
-license-file = "LICENSE"
+license = "MIT"
 keywords = ["HTML", "web"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

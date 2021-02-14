@@ -253,7 +253,7 @@ impl HtmlPage {
         self
     }
 
-    /// Adds the specified style with the
+    /// Adds the specified style data with the specified attributes
     pub fn add_style_attr(mut self, css: &str, attributes: HashMap<&str, &str>) -> Self {
         let style = HeadContent::Style {
             css: css.into(),
