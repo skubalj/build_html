@@ -61,6 +61,15 @@
 //! </html>
 //! ```
 //!
+//! # Extensibility
+//! The majority of the `add_x` methods specified in [`HtmlContainer`] are defined over generic
+//! bounds. This means that they are quite flexibile, and you can pass in almost anything
+//! implementing the [`ToString`] trait.
+//!
+//! In the event that you require additional tags or types not implemented in this library, you
+//! can achieve this using one of two escape hatches. For a more structured approach, consider
+//! seeing the documentation for [`HtmlContainer::add_html`]. For more one-off situations, consider
+//! [`HtmlContainer::add_raw`].
 
 mod attributes;
 mod container;

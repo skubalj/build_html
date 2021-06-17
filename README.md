@@ -95,6 +95,12 @@ Currently, this library supports adding the following HTML features / tags:
 * Style (`<style>`)
 * Title (`<title>`)
 
+### Extensibility
+In the event that you require additional tags or types not implemented in this library, you
+can achieve this using one of two escape hatches.
+1. You can implement your own HTML types and add them using `HtmlContainer::add_html`
+2. You can add one-off raw content using `HtmlContainer::add_raw`
+
 ## Acknowledgment
 Special thanks to Sean McArthur; the way that filters work in [warp](https://crates.io/crates/warp)
 was a major inspiration for how programmers would interact with this library.

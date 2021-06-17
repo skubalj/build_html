@@ -1,12 +1,12 @@
 //! This module contains the `Attributes` struct which defines a collection of
 //! attributes which can be added to an HTML tag.
 
-use std::collections::HashMap;
 use std::fmt;
+use std::iter::FromIterator;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Attributes {
-    attributes: HashMap<String, String>,
+    attributes: Vec<(String, String)>,
 }
 
 impl fmt::Display for Attributes {
@@ -14,36 +14,28 @@ impl fmt::Display for Attributes {
     ///
     /// Note that the attributes are automatically sorted.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut attribute_tags: Vec<String> = self
+        let attribute_tags: Vec<String> = self
             .attributes
             .iter()
             .map(|(key, value)| format!(r#" {}="{}""#, key, value))
             .collect();
-        attribute_tags.sort();
-        let content = attribute_tags
-            .iter()
-            .fold(String::new(), |acc, next| acc + &next);
-
-        write!(f, "{}", content)
+        write!(f, "{}", attribute_tags.join(""))
     }
 }
 
-impl From<HashMap<String, String>> for Attributes {
-    /// Creates a new `Attributes` collection from the specified HashMap
-    fn from(hash: HashMap<String, String>) -> Self {
-        Attributes { attributes: hash }
+impl<I: IntoIterator<Item = (S, S)>, S: ToString> From<I> for Attributes {
+    fn from(iter: I) -> Self {
+        let attributes: Vec<(String, String)> = iter
+            .into_iter()
+            .map(|(a, b)| (a.to_string(), b.to_string()))
+            .collect();
+        Self { attributes }
     }
 }
 
-impl From<HashMap<&str, &str>> for Attributes {
-    /// Creates a new `Attributes` collection from the specified HashMap
-    fn from(hash: HashMap<&str, &str>) -> Self {
-        Attributes {
-            attributes: hash
-                .into_iter()
-                .map(|(k, v)| (String::from(k), String::from(v)))
-                .collect(),
-        }
+impl<S: ToString> FromIterator<(S, S)> for Attributes {
+    fn from_iter<T: IntoIterator<Item = (S, S)>>(iter: T) -> Self {
+        iter.into()
     }
 }
 
@@ -59,7 +51,7 @@ impl Attributes {
     /// set with pre-defined content, see [`Attributes::from()`]
     pub fn empty() -> Self {
         Attributes {
-            attributes: HashMap::new(),
+            attributes: Vec::new(),
         }
     }
 }
@@ -73,28 +65,31 @@ mod tests {
     #[test]
     fn from_hash() {
         // Act
-        let sut = Attributes::from(hashmap! {
+        let mut sut = Attributes::from(hashmap! {
             "id" => "my-element",
             "class" => "my-css-class"
         });
+        sut.attributes.sort();
 
         // Assert
         assert_eq!(sut.attributes.len(), 2);
-        assert_eq!(sut.attributes["id"], "my-element");
-        assert_eq!(sut.attributes["class"], "my-css-class");
+        assert_eq!(
+            sut.attributes,
+            vec![
+                (String::from("class"), String::from("my-css-class")),
+                (String::from("id"), String::from("my-element")),
+            ]
+        );
     }
 
-    #[test_case(HashMap::new(), "" ; "test_0")]
-    #[test_case(hashmap! {"id" => "my-id"}, r#" id="my-id""# ; "test_1")]
-    #[test_case(hashmap! {"id" => "my-id", "class" => "my-class"}, r#" class="my-class" id="my-id""# ; "test_2")]
-    fn display(map: HashMap<&str, &str>, expected: &str) {
+    #[test_case(Vec::new(), "" ; "test_0")]
+    #[test_case(vec![("id", "my-id")], r#" id="my-id""# ; "test_1")]
+    #[test_case(vec![("id", "my-id"), ("class", "my-class")], r#" id="my-id" class="my-class""# ; "test_2")]
+    fn display(map: Vec<(&str, &str)>, expected: &str) {
         // Arrange
         let sut = Attributes::from(map);
 
-        // Act
-        let actual = format!("{}", sut);
-
-        // Assert
-        assert_eq!(actual, expected);
+        // Act / Assert
+        assert_eq!(sut.to_string(), expected);
     }
 }

@@ -68,6 +68,8 @@ pub enum BodyContent {
     Paragraph { content: String, attr: Attributes },
     /// An HTML preformatted text element `<pre>`
     Preformatted { content: String, attr: Attributes },
+    /// Raw string content, to be used as an escape hatch
+    Raw { content: String },
 }
 
 impl Html for BodyContent {
@@ -105,6 +107,7 @@ impl Html for BodyContent {
                 alt = alt,
                 attr = attr
             ),
+            BodyContent::Raw { content } => content.to_string(),
         }
     }
 }
@@ -148,16 +151,13 @@ mod tests {
             let sut = BodyContent::Header {
                 level: 6,
                 content: "Sub Heading".into(),
-                attr: Attributes::from(hashmap! {
-                    "id" => "sub",
-                    "class" => "heading"
-                }),
+                attr: vec![("id", "sub"), ("class", "heading")].into(),
             };
 
             // Act / Assert
             assert_eq!(
                 sut.to_html_string(),
-                r#"<h6 class="heading" id="sub">Sub Heading</h6>"#
+                r#"<h6 id="sub" class="heading">Sub Heading</h6>"#
             )
         }
 
@@ -198,11 +198,12 @@ mod tests {
             // Arrange
             let sut = BodyContent::Paragraph {
                 content: "This is sample text".into(),
-                attr: Attributes::from(hashmap! {
-                    "id" => "test-text",
-                    "onclick" => "something()",
-                    "class" => "text"
-                }),
+                attr: vec![
+                    ("class", "text"),
+                    ("id", "test-text"),
+                    ("onclick", "something()"),
+                ]
+                .into(),
             };
 
             // Act / Assert
