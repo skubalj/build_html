@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Version 1.1.0 (TBD)
+## Version 1.1.0 (2021-06-17)
 * Rise of the Generics! -- `add_x` methods are now much more flexible!
     * Pass any type implementing `ToString` as a required parameter
     * Pass attributes using more than just `HashMap`s (Including arrays with Rust 1.53)
