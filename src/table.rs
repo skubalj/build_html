@@ -39,8 +39,8 @@ where
 ///     [4, 5, 6],
 ///     [7, 8, 9]
 /// ];
-/// let html_table = Table::from(&source_table)
-///     .add_header_row(&['A', 'B', 'C'])
+/// let html_table = Table::from(source_table)
+///     .add_header_row(['A', 'B', 'C'])
 ///     .to_html_string();
 ///
 /// assert_eq!(
@@ -204,7 +204,7 @@ mod tests {
         let arr = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
 
         // Act
-        let result = Table::from(&arr).to_html_string();
+        let result = Table::from(arr).to_html_string();
 
         // Assert
         assert_eq!(

@@ -20,7 +20,7 @@ you can get easy access to every element using the import: `use build_html::*`.
 
 If compatibility is important, or you don't need access to every element, you can also import 
 piecemeal and prefix types with the package name. Note that the traits `Html` and 
-`HtmlContainer` must be exported for the library to be useful: 
+`HtmlContainer` must be in scope for the library to be useful: 
 ```rust
 use build_html::{self, Html, HtmlContainer};
 
@@ -34,21 +34,23 @@ an `HtmlPage`, and build up the document with chained method calls. Once the doc
 convert it to a `String` using `to_html_string()`. The `Display` trait is also implemented for all
 `Html` elements, meaning these elements can be converted into HTML using `format!()` as well.
 
-While adding content, required attributes are specified as method parameters. Additional optional
-parameters (such as `id` or `class` attributes) can be added as a `HashMap`. I recommend using the
-[`maplit`](https://crates.io/crates/maplit) library to create `HashMap` literals. 
+While adding content, required attributes are specified as method parameters. These parameters are
+generic on the `ToString` trait, allowing many useful types to be used. Additional optional
+parameters (such as `id` or `class` attributes) can be added by passing in some type implementing 
+the `IntoIterator` trait which has items which are 2-tuples of objects implementing `ToString`. 
+This means that you can use anything from a `HashMap<String, String>` to a `Vec<(&str, &str)>` to 
+(new with Rust 1.53) arrays of 2-tuples of static strings. 
 
 ```rust
 use build_html::*;
-use maplit::hashmap;
 
 let html: String = HtmlPage::new()
     .add_title("My Page")
     .add_header(1, "Main Content:")
     .add_container(
         Container::new(ContainerType::Article)
-            .with_attributes(hashmap! {"id" => "article1"})
-            .add_header_attr(2, "Hello, World", hashmap! {"id" => "article-head"})
+            .with_attributes([("id", "article1")])
+            .add_header_attr(2, "Hello, World", [("id", "article-head"), ("class", "header")])
             .add_paragraph("This is a simple HTML demo")
     )
     .to_html_string();
@@ -65,7 +67,7 @@ produces a string equivalent to:
     <body>
         <h1>Main Content:</h1>
         <article id="article1">
-            <h2 id="article-head">Hello World</h2>
+            <h2 id="article-head" class="header">Hello World</h2>
             <p>This is a simple HTML demo</p>
         </article>
     </body>
@@ -115,4 +117,4 @@ This project is licensed under the [MIT license](https://mit-license.org). In ot
 free for you to use for whatever purpose you want. However, to the maximum extent allowed under the
 law, this software has NO WARRANTY.
 
-Copyright (C) 2020 Joseph Skubal
+Copyright (C) 2020-21 Joseph Skubal
