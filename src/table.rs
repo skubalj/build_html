@@ -5,7 +5,6 @@
 
 use crate::attributes::Attributes;
 use crate::Html;
-use std::collections::HashMap;
 use std::fmt::Display;
 
 /// Parse the provided slice of elements into a table row
@@ -118,9 +117,8 @@ impl Table {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
     /// let table = Table::new()
-    ///     .with_attributes(hashmap! {"id" => "my-table"})
+    ///     .with_attributes([("id", "my-table")])
     ///     .to_html_string();
     ///
     /// assert_eq!(
@@ -128,7 +126,11 @@ impl Table {
     ///     r#"<table id="my-table"><thead></thead><tbody></tbody></table>"#
     /// );
     /// ```
-    pub fn with_attributes(mut self, attributes: HashMap<&str, &str>) -> Self {
+    pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
         self.attr = Attributes::from(attributes);
         self
     }

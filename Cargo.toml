@@ -14,5 +14,4 @@ keywords = ["HTML", "web"]
 [dependencies]
 
 [dev-dependencies]
-maplit = "1.0.2"
 test-case = "1.0.0"

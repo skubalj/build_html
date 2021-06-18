@@ -130,7 +130,6 @@ mod tests {
     /// Tests for the `BodyContent` enum
     mod body_content {
         use super::*;
-        use maplit::hashmap;
 
         #[test]
         fn test_header_1() {
@@ -167,7 +166,7 @@ mod tests {
             let sut = BodyContent::Image {
                 src: "myImage.jpg".into(),
                 alt: "This is alternate text".into(),
-                attr: Attributes::from(hashmap! {"class" => "images"}),
+                attr: Attributes::from(vec![("class", "images")]),
             };
 
             // Act / Assert

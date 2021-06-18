@@ -59,16 +59,16 @@ impl Attributes {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use maplit::hashmap;
+    use std::collections::HashMap;
     use test_case::test_case;
 
     #[test]
-    fn from_hash() {
+    fn from_hashmap() {
         // Act
-        let mut sut = Attributes::from(hashmap! {
-            "id" => "my-element",
-            "class" => "my-css-class"
-        });
+        let mut map = HashMap::new();
+        map.insert("id", "my-element");
+        map.insert("class", "my-css-class");
+        let mut sut = Attributes::from(map);
         sut.attributes.sort();
 
         // Assert

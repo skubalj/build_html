@@ -102,10 +102,8 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// use maplit::hashmap;
-    ///
     /// let page = HtmlPage::new()
-    ///     .add_head_link_attr("print.css", "stylesheet", hashmap! {"media" => "print"})
+    ///     .add_head_link_attr("print.css", "stylesheet", [("media", "print")])
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -114,16 +112,20 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_head_link_attr(
+    pub fn add_head_link_attr<A, S>(
         mut self,
-        href: &str,
-        rel: &str,
-        attributes: HashMap<&str, &str>,
-    ) -> Self {
+        href: impl ToString,
+        rel: impl ToString,
+        attr: A,
+    ) -> Self
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
         let link = HeadContent::Link {
-            href: href.into(),
-            rel: rel.into(),
-            attr: Attributes::from(attributes),
+            href: href.to_string(),
+            rel: rel.to_string(),
+            attr: attr.into(),
         };
         self.head.push(link);
         self
@@ -136,10 +138,9 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// use maplit::hashmap;
     ///
     /// let page = HtmlPage::new()
-    ///     .add_meta(hashmap! {"charset" => "utf-8"})
+    ///     .add_meta(vec![("charset", "utf-8")])
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -148,7 +149,11 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_meta(mut self, attributes: HashMap<&str, &str>) -> Self {
+    pub fn add_meta<A, S>(mut self, attributes: A) -> Self
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
         let meta = HeadContent::Meta {
             attr: attributes.into(),
         };
@@ -171,18 +176,22 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_script_link(mut self, src: &str) -> Self {
+    pub fn add_script_link(mut self, src: impl ToString) -> Self {
         let script = HeadContent::ScriptLink {
-            src: src.into(),
+            src: src.to_string(),
             attr: Attributes::default(),
         };
         self.head.push(script);
         self
     }
 
-    pub fn add_script_link_attr(mut self, src: &str, attributes: HashMap<&str, &str>) -> Self {
+    pub fn add_script_link_attr<A, S>(mut self, src: impl ToString, attributes: A) -> Self
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
         let script = HeadContent::ScriptLink {
-            src: src.into(),
+            src: src.to_string(),
             attr: attributes.into(),
         };
         self.head.push(script);
@@ -214,8 +223,10 @@ impl HtmlPage {
     ///     .add_script_literal(include_str!("myScript.js"))
     ///     .to_html_string();
     /// ```
-    pub fn add_script_literal(mut self, code: &str) -> Self {
-        let script = HeadContent::ScriptLiteral { code: code.into() };
+    pub fn add_script_literal(mut self, code: impl ToString) -> Self {
+        let script = HeadContent::ScriptLiteral {
+            code: code.to_string(),
+        };
         self.head.push(script);
         self
     }

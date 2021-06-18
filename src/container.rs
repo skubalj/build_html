@@ -3,7 +3,6 @@
 use crate::attributes::Attributes;
 use crate::html_container::HtmlContainer;
 use crate::Html;
-use std::collections::HashMap;
 use std::fmt::{self, Display};
 
 /// The different types of Html Containers that can be added to the page
@@ -124,15 +123,18 @@ impl Container {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
     /// let container = Container::default()
-    ///     .with_attributes(hashmap! {"class" => "defaults"})
+    ///     .with_attributes(vec![("class", "defaults")])
     ///     .add_paragraph("text")
     ///     .to_html_string();
     ///
     /// assert_eq!(container, r#"<div class="defaults"><p>text</p></div>"#)
     /// ```
-    pub fn with_attributes(mut self, attributes: HashMap<&str, &str>) -> Self {
+    pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
         self.attr = Attributes::from(attributes);
         self
     }
@@ -141,7 +143,6 @@ impl Container {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use maplit::hashmap;
     use test_case::test_case;
 
     #[test_case(ContainerType::Article; "article")]
@@ -159,11 +160,11 @@ mod tests {
 
         // Act
         let sut = Container::new(container_type)
-            .add_header_attr(1, "header", hashmap! {"id" => "main-header"})
+            .add_header_attr(1, "header", [("id", "main-header")])
             .add_image("myimage.png", "test image")
             .add_link("rust-lang.org", "Rust Home")
-            .add_paragraph_attr("Sample Text", hashmap! {"class" => "red-text"})
-            .add_preformatted_attr("Text", hashmap! {"class" => "code"});
+            .add_paragraph_attr("Sample Text", [("class", "red-text")])
+            .add_preformatted_attr("Text", [("class", "code")]);
 
         // Assert
         assert_eq!(
@@ -190,11 +191,11 @@ mod tests {
 
         // Act
         let sut = Container::new(container_type)
-            .add_header_attr(1, "header", hashmap! {"id" => "main-header"})
+            .add_header_attr(1, "header", [("id", "main-header")])
             .add_image("myimage.png", "test image")
             .add_link("rust-lang.org", "Rust Home")
-            .add_paragraph_attr("Sample Text", hashmap! {"class" => "red-text"})
-            .add_preformatted_attr("Text", hashmap! {"class" => "code"});
+            .add_paragraph_attr("Sample Text", [("class", "red-text")])
+            .add_preformatted_attr("Text", [("class", "code")]);
 
         // Assert
         assert_eq!(

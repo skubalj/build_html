@@ -8,6 +8,33 @@ use crate::Table;
 
 /// An HTML element that can contain other HTML elements
 ///
+/// The vast majority of methods on this trait are defined generically, allowing any type (or
+/// combination of types) implementing [`ToString`] to be passed in. Thanks to monomorphization,
+/// this can happen without incurring any runtime cost. For example:
+///
+/// ```
+/// # use build_html::*;
+/// # use std::net::Ipv4Addr;
+/// let addr = Ipv4Addr::new(127, 0, 0, 1);
+/// let content = Container::default().add_paragraph(addr).to_html_string();
+/// assert_eq!(content, "<div><p>127.0.0.1</p></div>")
+/// ```
+///
+/// Attributes can be passed in using any type that implements [`IntoIterator`] for 2-tuples of
+/// objects implementing `ToString`. That includes (as of Rust 1.53) arrays of `&str`s, which are
+/// very handy when content is known. For more dynamic attribute action, 
+/// [`HashMap`](std::collections::HashMap)s can also be used.
+///
+/// ```
+/// # use build_html::*;
+/// let content = Container::default()
+///     .add_paragraph_attr("123", [("id", "paragraph"), ("class", "action")])
+///     .to_html_string();
+/// assert_eq!(content, r#"<div><p id="paragraph" class="action">123</p></div>"#)
+/// ```
+///
+/// # Implementing
+///
 /// This trait implements the majority of the specific "add x" methods, requiring implementors
 /// to add only one method: [`add_html()`](crate::HtmlContainer::add_html)
 pub trait HtmlContainer: Html + Sized {
@@ -125,9 +152,8 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_header_attr(1, "Header Text", hashmap! {"id" => "main-header"})
+    ///     .add_header_attr(1, "Header Text", std::iter::once(("id", "main-header")))
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><h1 id="main-header">Header Text</h1></div>"#)
@@ -170,9 +196,11 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
+    /// # use std::collections::BTreeMap;
+    /// let mut attrs = BTreeMap::new();
+    /// attrs.insert("id", "sample-image");
     /// let content = Container::default()
-    ///     .add_image_attr("myimage.png", "a test image", hashmap! {"id" => "sample-image"})
+    ///     .add_image_attr("myimage.png", "a test image", attrs)
     ///     .to_html_string();
     ///
     /// assert_eq!(
@@ -218,9 +246,8 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_link_attr("https://rust-lang.org/", "Rust Homepage", hashmap! {"class" => "links"})
+    ///     .add_link_attr("https://rust-lang.org/", "Rust Homepage", [("class", "links")])
     ///     .to_html_string();
     ///
     /// assert_eq!(
@@ -265,9 +292,8 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_paragraph_attr("This is sample paragraph text", hashmap! {"class" => "text"})
+    ///     .add_paragraph_attr("This is sample paragraph text", [("class", "text")])
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><p class="text">This is sample paragraph text</p></div>"#)
@@ -308,9 +334,8 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// # use maplit::hashmap;
     /// let content = Container::default()
-    ///     .add_preformatted_attr("This | is   preformatted => text", hashmap! {"id" => "code"})
+    ///     .add_preformatted_attr("This | is   preformatted => text", [("id", "code")])
     ///     .to_html_string();
     ///
     /// assert_eq!(content, r#"<div><pre id="code">This | is   preformatted => text</pre></div>"#)

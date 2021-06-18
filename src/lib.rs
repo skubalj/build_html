@@ -23,21 +23,17 @@
 //! using chained methods.
 //!
 //! # Example
-//! This example uses the [`maplit`](https://crates.io/crates/maplit) crate to create `HashMap`
-//! literals. If your use case requires adding additional attributes, I would recommend this crate
-//! for its simplicity.
 //!
 //! ```rust
 //! use build_html::*;
-//! use maplit::hashmap;
 //!
 //! let html: String = HtmlPage::new()
 //!     .add_title("My Page")
 //!     .add_header(1, "Main Content:")
 //!     .add_container(
 //!         Container::new(ContainerType::Article)
-//!             .with_attributes(hashmap! {"id" => "article1"})
-//!             .add_header_attr(2, "Hello, World", hashmap! {"id" => "article-head"})
+//!             .with_attributes([("id", "article1")])
+//!             .add_header_attr(2, "Hello, World", [("id", "article-head")])
 //!             .add_paragraph("This is a simple HTML demo")
 //!     )
 //!     .to_html_string();
