@@ -14,8 +14,8 @@ use crate::Html;
 /// ```
 /// # use build_html::*;
 /// let page: String = HtmlPage::new()
-///     .add_title("My Page")
-///     .add_header(1, "Header Text")
+///     .with_title("My Page")
+///     .with_header(1, "Header Text")
 ///     .to_html_string();
 ///
 /// assert_eq!(page, concat!(
@@ -50,9 +50,8 @@ impl Html for HtmlPage {
 }
 
 impl HtmlContainer for HtmlPage {
-    fn add_html(mut self, html: Box<dyn Html>) -> Self {
+    fn add_html(&mut self, html: Box<dyn Html>) {
         self.body.push(html);
-        self
     }
 }
 
@@ -76,8 +75,31 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_head_link("favicon.ico", "icon");
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<link href="favicon.ico" rel="icon">"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_head_link(&mut self, href: impl ToString, rel: impl ToString) {
+        let link = HeadContent::Link {
+            href: href.to_string(),
+            rel: rel.to_string(),
+            attr: Attributes::default(),
+        };
+        self.head.push(link);
+    }
+
+    /// Adds a new link to the HTML head.
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_head_link("favicon.ico", "icon")
+    ///     .with_head_link("favicon.ico", "icon")
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -86,7 +108,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_head_link(mut self, href: impl ToString, rel: impl ToString) -> Self {
+    pub fn with_head_link(mut self, href: impl ToString, rel: impl ToString) -> Self {
         let link = HeadContent::Link {
             href: href.to_string(),
             rel: rel.to_string(),
@@ -101,8 +123,35 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_head_link_attr("print.css", "stylesheet", [("media", "print")]);
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<link href="print.css" rel="stylesheet" media="print">"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_head_link_attr<A, S>(&mut self, href: impl ToString, rel: impl ToString, attr: A)
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
+        let link = HeadContent::Link {
+            href: href.to_string(),
+            rel: rel.to_string(),
+            attr: attr.into(),
+        };
+        self.head.push(link);
+    }
+
+    /// Adds a new link to the HTML head with the specified additional attributes
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_head_link_attr("print.css", "stylesheet", [("media", "print")])
+    ///     .with_head_link_attr("print.css", "stylesheet", [("media", "print")])
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -111,7 +160,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_head_link_attr<A, S>(
+    pub fn with_head_link_attr<A, S>(
         mut self,
         href: impl ToString,
         rel: impl ToString,
@@ -137,9 +186,36 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_meta(vec![("charset", "utf-8")]);
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<meta charset="utf-8">"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_meta<A, S>(&mut self, attributes: A)
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
+        let meta = HeadContent::Meta {
+            attr: attributes.into(),
+        };
+        self.head.push(meta);
+    }
+
+    /// Adds the specified metadata elements to this `HtmlPage`
+    ///
+    /// Attributes are specified in a `HashMap`
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     ///
     /// let page = HtmlPage::new()
-    ///     .add_meta(vec![("charset", "utf-8")])
+    ///     .with_meta(vec![("charset", "utf-8")])
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -148,7 +224,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_meta<A, S>(mut self, attributes: A) -> Self
+    pub fn with_meta<A, S>(mut self, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
@@ -165,8 +241,30 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_script_link("myScript.js");
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<script src="myScript.js"></script>"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_script_link(&mut self, src: impl ToString) {
+        let script = HeadContent::ScriptLink {
+            src: src.to_string(),
+            attr: Attributes::default(),
+        };
+        self.head.push(script);
+    }
+
+    /// Adds the specified external script to the `HtmlPage`
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_script_link("myScript.js")
+    ///     .with_script_link("myScript.js")
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -175,7 +273,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_script_link(mut self, src: impl ToString) -> Self {
+    pub fn with_script_link(mut self, src: impl ToString) -> Self {
         let script = HeadContent::ScriptLink {
             src: src.to_string(),
             attr: Attributes::default(),
@@ -185,7 +283,20 @@ impl HtmlPage {
     }
 
     /// Adds a script link with additional attributes to the `HtmlPage`
-    pub fn add_script_link_attr<A, S>(mut self, src: impl ToString, attributes: A) -> Self
+    pub fn add_script_link_attr<A, S>(&mut self, src: impl ToString, attributes: A)
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
+        let script = HeadContent::ScriptLink {
+            src: src.to_string(),
+            attr: attributes.into(),
+        };
+        self.head.push(script);
+    }
+
+    /// Adds a script link with additional attributes to the `HtmlPage`
+    pub fn with_script_link_attr<A, S>(mut self, src: impl ToString, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
@@ -203,8 +314,38 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_script_literal(r#"window.onload = () => console.log("Hello World");"#);
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head><script>",
+    ///     r#"window.onload = () => console.log("Hello World");"#,
+    ///     "</script></head><body></body></html>"
+    /// ));
+    /// ```
+    ///
+    /// In order to lint the code, it can be helpful to define your script in
+    /// its own file. That file can be inserted into the html page using the
+    /// [`include_str`] macro:
+    ///
+    /// ```rust, ignore (cannot-doctest-external-file-dependency)
+    /// let mut page = HtmlPage::new();
+    /// page.add_script_literal(include_str!("myScript.js"));
+    /// ```
+    pub fn add_script_literal(&mut self, code: impl ToString) {
+        let script = HeadContent::ScriptLiteral {
+            code: code.to_string(),
+        };
+        self.head.push(script);
+    }
+
+    /// Adds the specified script to this `HtmlPage`
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_script_literal(r#"window.onload = () => console.log("Hello World");"#)
+    ///     .with_script_literal(r#"window.onload = () => console.log("Hello World");"#)
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -220,10 +361,10 @@ impl HtmlPage {
     ///
     /// ```ignore (cannot-doctest-external-file-dependency)
     /// let page = HtmlPage::new()
-    ///     .add_script_literal(include_str!("myScript.js"))
+    ///     .with_script_literal(include_str!("myScript.js"))
     ///     .to_html_string();
     /// ```
-    pub fn add_script_literal(mut self, code: impl ToString) -> Self {
+    pub fn with_script_literal(mut self, code: impl ToString) -> Self {
         let script = HeadContent::ScriptLiteral {
             code: code.to_string(),
         };
@@ -236,8 +377,38 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_style(r#"p{font-family:"Liberation Serif";}"#);
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<style>p{font-family:"Liberation Serif";}</style>"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    ///
+    /// To allow for linting, it can be helpful to define CSS in its own file.
+    /// That file can be included at compile time using the [`include_str`] macro:
+    ///
+    /// ```ignore (cannot-doctest-external-file-dependency)
+    /// let mut page = HtmlPage::new();
+    /// page.add_style(include_str!("styles.css"));
+    /// ```
+    pub fn add_style(&mut self, css: impl ToString) {
+        let style = HeadContent::Style {
+            css: css.to_string(),
+            attr: Attributes::default(),
+        };
+        self.head.push(style);
+    }
+
+    /// Adds raw style data to this `HtmlPage`
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_style(r#"p{font-family:"Liberation Serif";}"#)
+    ///     .with_style(r#"p{font-family:"Liberation Serif";}"#)
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -252,10 +423,10 @@ impl HtmlPage {
     ///
     /// ```ignore (cannot-doctest-external-file-dependency)
     /// let page = HtmlPage::new()
-    ///     .add_style(include_str!("styles.css"))
+    ///     .with_style(include_str!("styles.css"))
     ///     .to_html_string();
     /// ```
-    pub fn add_style(mut self, css: impl ToString) -> Self {
+    pub fn with_style(mut self, css: impl ToString) -> Self {
         let style = HeadContent::Style {
             css: css.to_string(),
             attr: Attributes::default(),
@@ -265,7 +436,20 @@ impl HtmlPage {
     }
 
     /// Adds the specified style data with the specified attributes
-    pub fn add_style_attr<A, S>(mut self, css: impl ToString, attributes: A) -> Self
+    pub fn add_style_attr<A, S>(&mut self, css: impl ToString, attributes: A)
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
+        let style = HeadContent::Style {
+            css: css.to_string(),
+            attr: attributes.into(),
+        };
+        self.head.push(style);
+    }
+
+    /// Adds the specified style data with the specified attributes
+    pub fn with_style_attr<A, S>(mut self, css: impl ToString, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
@@ -285,8 +469,28 @@ impl HtmlPage {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_stylesheet("print.css");
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     r#"<link href="print.css" rel="stylesheet">"#,
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_stylesheet(&mut self, source: impl ToString) {
+        self.add_head_link(source, "stylesheet")
+    }
+
+    /// Adds the specified stylesheet to the HTML head.
+    ///
+    /// This method uses [`add_head_link`](HtmlPage::add_head_link) internally
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_stylesheet("print.css")
+    ///     .with_stylesheet("print.css")
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -295,8 +499,29 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_stylesheet(self, source: impl ToString) -> Self {
-        self.add_head_link(source, "stylesheet")
+    pub fn with_stylesheet(self, source: impl ToString) -> Self {
+        self.with_head_link(source, "stylesheet")
+    }
+
+    /// Adds a title to this HTML page
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
+    /// let mut page = HtmlPage::new();
+    /// page.add_title("My Page");
+    ///
+    /// assert_eq!(page.to_html_string(), concat!(
+    ///     "<!DOCTYPE html><html><head>",
+    ///     "<title>My Page</title>",
+    ///     "</head><body></body></html>"
+    /// ));
+    /// ```
+    pub fn add_title(&mut self, title_text: impl ToString) {
+        let title = HeadContent::Title {
+            content: title_text.to_string(),
+        };
+        self.head.push(title);
     }
 
     /// Adds a title to this HTML page
@@ -305,7 +530,7 @@ impl HtmlPage {
     /// ```
     /// # use build_html::*;
     /// let page = HtmlPage::new()
-    ///     .add_title("My Page")
+    ///     .with_title("My Page")
     ///     .to_html_string();
     ///
     /// assert_eq!(page, concat!(
@@ -314,7 +539,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_title(mut self, title_text: impl ToString) -> Self {
+    pub fn with_title(mut self, title_text: impl ToString) -> Self {
         let title = HeadContent::Title {
             content: title_text.to_string(),
         };

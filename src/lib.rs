@@ -14,7 +14,7 @@
 //! use build_html::{self, Html, HtmlContainer};
 //!
 //! let page = build_html::HtmlPage::new()
-//!     .add_paragraph("Some Text")
+//!     .with_paragraph("Some Text")
 //!     .to_html_string();
 //! ```
 //!
@@ -28,13 +28,13 @@
 //! use build_html::*;
 //!
 //! let html: String = HtmlPage::new()
-//!     .add_title("My Page")
-//!     .add_header(1, "Main Content:")
-//!     .add_container(
+//!     .with_title("My Page")
+//!     .with_header(1, "Main Content:")
+//!     .with_container(
 //!         Container::new(ContainerType::Article)
 //!             .with_attributes([("id", "article1")])
-//!             .add_header_attr(2, "Hello, World", [("id", "article-head")])
-//!             .add_paragraph("This is a simple HTML demo")
+//!             .with_header_attr(2, "Hello, World", [("id", "article-head")])
+//!             .with_paragraph("This is a simple HTML demo")
 //!     )
 //!     .to_html_string();
 //! ```
@@ -94,7 +94,7 @@ pub trait Html: std::fmt::Debug {
     /// ```
     /// # use build_html::*;
     /// let html = Container::default()
-    ///     .add_paragraph("My p element")
+    ///     .with_paragraph("My p element")
     ///     .to_html_string();
     ///
     /// assert_eq!(html, "<div><p>My p element</p></div>")

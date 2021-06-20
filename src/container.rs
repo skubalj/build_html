@@ -46,12 +46,12 @@ impl Display for ContainerType {
 /// ```rust
 /// # use build_html::*;
 /// let text = Container::new(ContainerType::Main)
-///     .add_header(1, "My Container")
-///     .add_container(
+///     .with_header(1, "My Container")
+///     .with_container(
 ///         Container::new(ContainerType::Article)
-///             .add_container(
+///             .with_container(
 ///                 Container::new(ContainerType::Div)
-///                     .add_paragraph("Inner Text")
+///                     .with_paragraph("Inner Text")
 ///             )
 ///     )
 ///     .to_html_string();
@@ -93,9 +93,8 @@ impl Html for Container {
 }
 
 impl HtmlContainer for Container {
-    fn add_html(mut self, content: Box<dyn Html>) -> Self {
+    fn add_html(&mut self, content: Box<dyn Html>) {
         self.elements.push(content);
-        self
     }
 }
 
@@ -125,7 +124,7 @@ impl Container {
     /// # use build_html::*;
     /// let container = Container::default()
     ///     .with_attributes(vec![("class", "defaults")])
-    ///     .add_paragraph("text")
+    ///     .with_paragraph("text")
     ///     .to_html_string();
     ///
     /// assert_eq!(container, r#"<div class="defaults"><p>text</p></div>"#)
@@ -160,11 +159,11 @@ mod tests {
 
         // Act
         let sut = Container::new(container_type)
-            .add_header_attr(1, "header", [("id", "main-header")])
-            .add_image("myimage.png", "test image")
-            .add_link("rust-lang.org", "Rust Home")
-            .add_paragraph_attr("Sample Text", [("class", "red-text")])
-            .add_preformatted_attr("Text", [("class", "code")]);
+            .with_header_attr(1, "header", [("id", "main-header")])
+            .with_image("myimage.png", "test image")
+            .with_link("rust-lang.org", "Rust Home")
+            .with_paragraph_attr("Sample Text", [("class", "red-text")])
+            .with_preformatted_attr("Text", [("class", "code")]);
 
         // Assert
         assert_eq!(
@@ -191,11 +190,11 @@ mod tests {
 
         // Act
         let sut = Container::new(container_type)
-            .add_header_attr(1, "header", [("id", "main-header")])
-            .add_image("myimage.png", "test image")
-            .add_link("rust-lang.org", "Rust Home")
-            .add_paragraph_attr("Sample Text", [("class", "red-text")])
-            .add_preformatted_attr("Text", [("class", "code")]);
+            .with_header_attr(1, "header", [("id", "main-header")])
+            .with_image("myimage.png", "test image")
+            .with_link("rust-lang.org", "Rust Home")
+            .with_paragraph_attr("Sample Text", [("class", "red-text")])
+            .with_preformatted_attr("Text", [("class", "code")]);
 
         // Assert
         assert_eq!(
@@ -212,14 +211,14 @@ mod tests {
     fn test_nesting() {
         // Act
         let container = Container::new(ContainerType::Main)
-            .add_paragraph("paragraph")
-            .add_container(
+            .with_paragraph("paragraph")
+            .with_container(
                 Container::new(ContainerType::OrderedList)
-                    .add_container(Container::default().add_paragraph(1))
-                    .add_container(Container::default().add_paragraph('2'))
-                    .add_container(Container::default().add_paragraph("3")),
+                    .with_container(Container::default().with_paragraph(1))
+                    .with_container(Container::default().with_paragraph('2'))
+                    .with_container(Container::default().with_paragraph("3")),
             )
-            .add_paragraph("done");
+            .with_paragraph("done");
 
         // Assert
         assert_eq!(

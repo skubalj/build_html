@@ -40,7 +40,7 @@ where
 ///     [7, 8, 9]
 /// ];
 /// let html_table = Table::from(source_table)
-///     .add_header_row(['A', 'B', 'C'])
+///     .with_header_row(['A', 'B', 'C'])
 ///     .to_html_string();
 ///
 /// assert_eq!(
@@ -117,6 +117,30 @@ impl Table {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut table = Table::new();
+    /// table.add_attributes([("id", "my-table")]);
+    ///
+    /// assert_eq!(
+    ///     table.to_html_string(),
+    ///     r#"<table id="my-table"><thead></thead><tbody></tbody></table>"#
+    /// );
+    /// ```
+    pub fn add_attributes<A, S>(&mut self, attributes: A)
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
+        self.attr = Attributes::from(attributes);
+    }
+
+    /// Associates the specified map of attributes with this `Table`.
+    ///
+    /// Note that this operation overrides all previous `with_attribute` calls on
+    /// this `Table`
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let table = Table::new()
     ///     .with_attributes([("id", "my-table")])
     ///     .to_html_string();
@@ -142,8 +166,34 @@ impl Table {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut table = Table::new();
+    /// table.add_header_row(vec!["Mon", "Tues", "Wed", "Thurs", "Fri"]);
+    /// assert_eq!(
+    ///     table.to_html_string(),
+    ///     concat!(
+    ///         "<table><thead>",
+    ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
+    ///         "</thead><tbody></tbody></table>"
+    ///     )
+    /// )
+    /// ```
+    pub fn add_header_row<T>(&mut self, row: T)
+    where
+        T: IntoIterator,
+        T::Item: Display,
+    {
+        self.thead.push(parse_table_row(row, "th"));
+    }
+
+    /// Adds the specified row to the table header
+    ///
+    /// Note that no checking is done to ensure that the row is of the proper length
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let table = Table::new()
-    ///     .add_header_row(vec!["Mon", "Tues", "Wed", "Thurs", "Fri"])
+    ///     .with_header_row(vec!["Mon", "Tues", "Wed", "Thurs", "Fri"])
     ///     .to_html_string();
     ///
     /// assert_eq!(
@@ -155,7 +205,7 @@ impl Table {
     ///     )
     /// )
     /// ```
-    pub fn add_header_row<T>(mut self, row: T) -> Self
+    pub fn with_header_row<T>(mut self, row: T) -> Self
     where
         T: IntoIterator,
         T::Item: Display,
@@ -171,8 +221,35 @@ impl Table {
     /// # Example
     /// ```
     /// # use build_html::*;
+    /// let mut table = Table::new();
+    /// table.add_body_row(vec![1, 2, 3, 4, 5]);
+    ///
+    /// assert_eq!(
+    ///     table.to_html_string(),
+    ///     concat!(
+    ///         "<table><thead></thead><tbody>",
+    ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
+    ///         "</tbody></table>"
+    ///     )
+    /// )
+    /// ```
+    pub fn add_body_row<T>(&mut self, row: T)
+    where
+        T: IntoIterator,
+        T::Item: Display,
+    {
+        self.tbody.push(parse_table_row(row, "td"));
+    }
+
+    /// Adds the specified row to the table body
+    ///
+    /// Note that no checking is done to ensure that the row is of the proper length
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
     /// let table = Table::new()
-    ///     .add_body_row(vec![1, 2, 3, 4, 5])
+    ///     .with_body_row(vec![1, 2, 3, 4, 5])
     ///     .to_html_string();
     ///
     /// assert_eq!(
@@ -184,7 +261,7 @@ impl Table {
     ///     )
     /// )
     /// ```
-    pub fn add_body_row<T>(mut self, row: T) -> Self
+    pub fn with_body_row<T>(mut self, row: T) -> Self
     where
         T: IntoIterator,
         T::Item: Display,
