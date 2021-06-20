@@ -44,6 +44,7 @@ impl Html for HeadContent {
     }
 }
 
+/// The different types of content that can be embedded into the HTML body
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum BodyContent {
     /// An HTML header element `<h#>`

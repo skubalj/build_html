@@ -4,7 +4,6 @@ use crate::attributes::Attributes;
 use crate::content::HeadContent;
 use crate::html_container::HtmlContainer;
 use crate::Html;
-use std::collections::HashMap;
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
 ///
@@ -87,10 +86,10 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_head_link(mut self, href: &str, rel: &str) -> Self {
+    pub fn add_head_link(mut self, href: impl ToString, rel: impl ToString) -> Self {
         let link = HeadContent::Link {
-            href: href.into(),
-            rel: rel.into(),
+            href: href.to_string(),
+            rel: rel.to_string(),
             attr: Attributes::default(),
         };
         self.head.push(link);
@@ -185,6 +184,7 @@ impl HtmlPage {
         self
     }
 
+    /// Adds a script link with additional attributes to the `HtmlPage`
     pub fn add_script_link_attr<A, S>(mut self, src: impl ToString, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
@@ -255,9 +255,9 @@ impl HtmlPage {
     ///     .add_style(include_str!("styles.css"))
     ///     .to_html_string();
     /// ```
-    pub fn add_style(mut self, css: &str) -> Self {
+    pub fn add_style(mut self, css: impl ToString) -> Self {
         let style = HeadContent::Style {
-            css: css.into(),
+            css: css.to_string(),
             attr: Attributes::default(),
         };
         self.head.push(style);
@@ -265,9 +265,13 @@ impl HtmlPage {
     }
 
     /// Adds the specified style data with the specified attributes
-    pub fn add_style_attr(mut self, css: &str, attributes: HashMap<&str, &str>) -> Self {
+    pub fn add_style_attr<A, S>(mut self, css: impl ToString, attributes: A) -> Self
+    where
+        A: IntoIterator<Item = (S, S)>,
+        S: ToString,
+    {
         let style = HeadContent::Style {
-            css: css.into(),
+            css: css.to_string(),
             attr: attributes.into(),
         };
         self.head.push(style);
@@ -291,7 +295,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_stylesheet(self, source: &str) -> Self {
+    pub fn add_stylesheet(self, source: impl ToString) -> Self {
         self.add_head_link(source, "stylesheet")
     }
 
@@ -310,9 +314,9 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn add_title(mut self, title_text: &str) -> Self {
+    pub fn add_title(mut self, title_text: impl ToString) -> Self {
         let title = HeadContent::Title {
-            content: title_text.into(),
+            content: title_text.to_string(),
         };
         self.head.push(title);
         self
