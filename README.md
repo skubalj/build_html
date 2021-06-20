@@ -25,7 +25,7 @@ piecemeal and prefix types with the package name. Note that the traits `Html` an
 use build_html::{self, Html, HtmlContainer};
 
 let page = build_html::HtmlPage::new()
-    .add_paragraph("Some Text")
+    .with_paragraph("Some Text")
     .to_html_string();
 ```
 
@@ -45,13 +45,13 @@ This means that you can use anything from a `HashMap<String, String>` to a `Vec<
 use build_html::*;
 
 let html: String = HtmlPage::new()
-    .add_title("My Page")
-    .add_header(1, "Main Content:")
-    .add_container(
+    .with_title("My Page")
+    .with_header(1, "Main Content:")
+    .with_container(
         Container::new(ContainerType::Article)
             .with_attributes([("id", "article1")])
-            .add_header_attr(2, "Hello, World", [("id", "article-head"), ("class", "header")])
-            .add_paragraph("This is a simple HTML demo")
+            .with_header_attr(2, "Hello, World", [("id", "article-head"), ("class", "header")])
+            .with_paragraph("This is a simple HTML demo")
     )
     .to_html_string();
 ```
@@ -104,11 +104,7 @@ can achieve this using one of two escape hatches.
 2. You can add one-off raw content using `HtmlContainer::add_raw`
 
 ## Acknowledgment
-Special thanks to Sean McArthur; the way that filters work in [warp](https://crates.io/crates/warp)
-was a major inspiration for how programmers would interact with this library.
-
 This project was made possible thanks to the following great projects:
-* [maplit](https://crates.io/crates/maplit): Bluss
 * [test-case](https://crates.io/crates/test-case): Marcin Sas-Szymanski, Wojciech Polak
 * [Rust](https://rust-lang.org)
 

@@ -8,12 +8,18 @@ use std::fmt::{self, Display};
 /// The different types of Html Containers that can be added to the page
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum ContainerType {
+    /// Corresponds to `<address>` tags
+    Address,
     /// Corresponds to `<article>` tags
     Article,
     /// Corresponds to `<div>` tags
     ///
     /// This type is also the default for `Container`s
     Div,
+    /// Corresponds to `<footer>` tags
+    Footer,
+    /// Corresponds to `<header>` tags
+    Header,
     /// Corresponds to `<main>` tags
     Main,
     /// Corresponds to `<ol>` tags
@@ -25,8 +31,11 @@ pub enum ContainerType {
 impl Display for ContainerType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            Self::Address => write!(f, "address"),
             Self::Article => write!(f, "article"),
             Self::Div => write!(f, "div"),
+            Self::Footer => write!(f, "footer"),
+            Self::Header => write!(f, "header"),
             Self::Main => write!(f, "main"),
             Self::OrderedList => write!(f, "ol"),
             Self::UnorderedList => write!(f, "ul"),

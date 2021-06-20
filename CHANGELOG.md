@@ -2,6 +2,7 @@ Changelog
 =========
 
 ## Master
+* Refactored API, divided into "add" for mutable and "with" for chainable
 * Fixed non-generic fields which snuck by in 1.1.0
 
 ## Version 1.1.0 (2021-06-17)
