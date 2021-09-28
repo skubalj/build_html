@@ -25,33 +25,24 @@ use crate::Html;
 /// ```
 #[derive(Debug)]
 pub struct HtmlPage {
-    head: Vec<HeadContent>,
-    body: Vec<Box<dyn Html>>,
+    head: Vec<String>,
+    body: Vec<String>,
 }
 
 impl Html for HtmlPage {
     fn to_html_string(&self) -> String {
-        let head = self
-            .head
-            .iter()
-            .map(|element| element.to_html_string())
-            .fold(String::new(), |acc, next| acc + &next);
-        let body = self
-            .body
-            .iter()
-            .map(|element| element.to_html_string())
-            .fold(String::new(), |acc, next| acc + &next);
-
         format!(
             "<!DOCTYPE html><html><head>{}</head><body>{}</body></html>",
-            head, body
+            self.head.join(""),
+            self.body.join("")
         )
     }
 }
 
 impl HtmlContainer for HtmlPage {
-    fn add_html(&mut self, html: Box<dyn Html>) {
-        self.body.push(html);
+    #[inline]
+    fn add_html<H: Html>(&mut self, html: H) {
+        self.body.push(html.to_html_string());
     }
 }
 
@@ -70,6 +61,19 @@ impl HtmlPage {
         }
     }
 
+    /// Helper function similar to [`HtmlContainer::add_html`]
+    #[inline]
+    fn add_html_head<H: Html>(&mut self, html: H) {
+        self.head.push(html.to_html_string());
+    }
+
+    /// Helper function similar to [`HtmlContainer::with_html`]
+    #[inline]
+    fn with_html_head<H: Html>(mut self, html: H) -> Self {
+        self.add_html_head(html);
+        self
+    }
+
     /// Adds a new link to the HTML head.
     ///
     /// # Example
@@ -85,12 +89,11 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn add_head_link(&mut self, href: impl ToString, rel: impl ToString) {
-        let link = HeadContent::Link {
+        self.add_html_head(HeadContent::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: Attributes::default(),
-        };
-        self.head.push(link);
+        })
     }
 
     /// Adds a new link to the HTML head.
@@ -108,14 +111,12 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn with_head_link(mut self, href: impl ToString, rel: impl ToString) -> Self {
-        let link = HeadContent::Link {
+    pub fn with_head_link(self, href: impl ToString, rel: impl ToString) -> Self {
+        self.with_html_head(HeadContent::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: Attributes::default(),
-        };
-        self.head.push(link);
-        self
+        })
     }
 
     /// Adds a new link to the HTML head with the specified additional attributes
@@ -137,12 +138,11 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let link = HeadContent::Link {
+        self.add_html_head(HeadContent::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: attr.into(),
-        };
-        self.head.push(link);
+        })
     }
 
     /// Adds a new link to the HTML head with the specified additional attributes
@@ -160,23 +160,16 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn with_head_link_attr<A, S>(
-        mut self,
-        href: impl ToString,
-        rel: impl ToString,
-        attr: A,
-    ) -> Self
+    pub fn with_head_link_attr<A, S>(self, href: impl ToString, rel: impl ToString, attr: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let link = HeadContent::Link {
+        self.with_html_head(HeadContent::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: attr.into(),
-        };
-        self.head.push(link);
-        self
+        })
     }
 
     /// Adds the specified metadata elements to this `HtmlPage`
@@ -200,10 +193,9 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let meta = HeadContent::Meta {
+        self.add_html_head(HeadContent::Meta {
             attr: attributes.into(),
-        };
-        self.head.push(meta);
+        })
     }
 
     /// Adds the specified metadata elements to this `HtmlPage`
@@ -224,16 +216,14 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn with_meta<A, S>(mut self, attributes: A) -> Self
+    pub fn with_meta<A, S>(self, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let meta = HeadContent::Meta {
+        self.with_html_head(HeadContent::Meta {
             attr: attributes.into(),
-        };
-        self.head.push(meta);
-        self
+        })
     }
 
     /// Adds the specified external script to the `HtmlPage`
@@ -251,11 +241,10 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn add_script_link(&mut self, src: impl ToString) {
-        let script = HeadContent::ScriptLink {
+        self.add_html_head(HeadContent::ScriptLink {
             src: src.to_string(),
             attr: Attributes::default(),
-        };
-        self.head.push(script);
+        })
     }
 
     /// Adds the specified external script to the `HtmlPage`
@@ -273,13 +262,11 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn with_script_link(mut self, src: impl ToString) -> Self {
-        let script = HeadContent::ScriptLink {
+    pub fn with_script_link(self, src: impl ToString) -> Self {
+        self.with_html_head(HeadContent::ScriptLink {
             src: src.to_string(),
             attr: Attributes::default(),
-        };
-        self.head.push(script);
-        self
+        })
     }
 
     /// Adds a script link with additional attributes to the `HtmlPage`
@@ -288,25 +275,22 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let script = HeadContent::ScriptLink {
+        self.add_html_head(HeadContent::ScriptLink {
             src: src.to_string(),
             attr: attributes.into(),
-        };
-        self.head.push(script);
+        })
     }
 
     /// Adds a script link with additional attributes to the `HtmlPage`
-    pub fn with_script_link_attr<A, S>(mut self, src: impl ToString, attributes: A) -> Self
+    pub fn with_script_link_attr<A, S>(self, src: impl ToString, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let script = HeadContent::ScriptLink {
+        self.with_html_head(HeadContent::ScriptLink {
             src: src.to_string(),
             attr: attributes.into(),
-        };
-        self.head.push(script);
-        self
+        })
     }
 
     /// Adds the specified script to this `HtmlPage`
@@ -333,10 +317,9 @@ impl HtmlPage {
     /// page.add_script_literal(include_str!("myScript.js"));
     /// ```
     pub fn add_script_literal(&mut self, code: impl ToString) {
-        let script = HeadContent::ScriptLiteral {
+        self.add_html_head(HeadContent::ScriptLiteral {
             code: code.to_string(),
-        };
-        self.head.push(script);
+        })
     }
 
     /// Adds the specified script to this `HtmlPage`
@@ -364,12 +347,10 @@ impl HtmlPage {
     ///     .with_script_literal(include_str!("myScript.js"))
     ///     .to_html_string();
     /// ```
-    pub fn with_script_literal(mut self, code: impl ToString) -> Self {
-        let script = HeadContent::ScriptLiteral {
+    pub fn with_script_literal(self, code: impl ToString) -> Self {
+        self.with_html_head(HeadContent::ScriptLiteral {
             code: code.to_string(),
-        };
-        self.head.push(script);
-        self
+        })
     }
 
     /// Adds raw style data to this `HtmlPage`
@@ -395,11 +376,10 @@ impl HtmlPage {
     /// page.add_style(include_str!("styles.css"));
     /// ```
     pub fn add_style(&mut self, css: impl ToString) {
-        let style = HeadContent::Style {
+        self.add_html_head(HeadContent::Style {
             css: css.to_string(),
             attr: Attributes::default(),
-        };
-        self.head.push(style);
+        })
     }
 
     /// Adds raw style data to this `HtmlPage`
@@ -426,13 +406,11 @@ impl HtmlPage {
     ///     .with_style(include_str!("styles.css"))
     ///     .to_html_string();
     /// ```
-    pub fn with_style(mut self, css: impl ToString) -> Self {
-        let style = HeadContent::Style {
+    pub fn with_style(self, css: impl ToString) -> Self {
+        self.with_html_head(HeadContent::Style {
             css: css.to_string(),
             attr: Attributes::default(),
-        };
-        self.head.push(style);
-        self
+        })
     }
 
     /// Adds the specified style data with the specified attributes
@@ -441,25 +419,22 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let style = HeadContent::Style {
+        self.add_html_head(HeadContent::Style {
             css: css.to_string(),
             attr: attributes.into(),
-        };
-        self.head.push(style);
+        })
     }
 
     /// Adds the specified style data with the specified attributes
-    pub fn with_style_attr<A, S>(mut self, css: impl ToString, attributes: A) -> Self
+    pub fn with_style_attr<A, S>(self, css: impl ToString, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let style = HeadContent::Style {
+        self.with_html_head(HeadContent::Style {
             css: css.to_string(),
             attr: attributes.into(),
-        };
-        self.head.push(style);
-        self
+        })
     }
 
     /// Adds the specified stylesheet to the HTML head.
@@ -478,6 +453,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
+    #[inline]
     pub fn add_stylesheet(&mut self, source: impl ToString) {
         self.add_head_link(source, "stylesheet")
     }
@@ -499,6 +475,7 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
+    #[inline]
     pub fn with_stylesheet(self, source: impl ToString) -> Self {
         self.with_head_link(source, "stylesheet")
     }
@@ -518,10 +495,9 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn add_title(&mut self, title_text: impl ToString) {
-        let title = HeadContent::Title {
+        self.add_html_head(HeadContent::Title {
             content: title_text.to_string(),
-        };
-        self.head.push(title);
+        })
     }
 
     /// Adds a title to this HTML page
@@ -539,12 +515,10 @@ impl HtmlPage {
     ///     "</head><body></body></html>"
     /// ));
     /// ```
-    pub fn with_title(mut self, title_text: impl ToString) -> Self {
-        let title = HeadContent::Title {
+    pub fn with_title(self, title_text: impl ToString) -> Self {
+        self.with_html_head(HeadContent::Title {
             content: title_text.to_string(),
-        };
-        self.head.push(title);
-        self
+        })
     }
 }
 

@@ -73,36 +73,31 @@ impl Display for ContainerType {
 #[derive(Debug)]
 pub struct Container {
     tag: ContainerType,
-    elements: Vec<Box<dyn Html>>,
+    elements: Vec<String>,
     attr: Attributes,
 }
 
 impl Html for Container {
     fn to_html_string(&self) -> String {
-        let content = match self.tag {
-            ContainerType::OrderedList | ContainerType::UnorderedList => self
-                .elements
-                .iter()
-                .map(|item| format!("<li>{}</li>", item.to_html_string()))
-                .fold(String::new(), |acc, next| acc + &next),
-            _ => self
-                .elements
-                .iter()
-                .map(|item| item.to_html_string())
-                .fold(String::new(), |acc, next| acc + &next),
-        };
-
         format!(
             "<{tag}{attr}>{content}</{tag}>",
             tag = self.tag,
             attr = self.attr,
-            content = content
+            content = self.elements.join(""),
         )
     }
 }
 
 impl HtmlContainer for Container {
-    fn add_html(&mut self, content: Box<dyn Html>) {
+    #[inline]
+    fn add_html<H: Html>(&mut self, content: H) {
+        let content: String = match self.tag {
+            ContainerType::OrderedList | ContainerType::UnorderedList => {
+                format!("<li>{}</li>", content.to_html_string())
+            }
+            _ => content.to_html_string(),
+        };
+
         self.elements.push(content);
     }
 }

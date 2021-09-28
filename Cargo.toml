@@ -1,12 +1,13 @@
 [package]
 name = "build_html"
-version = "1.1.0"
+version = "2.0.0"
 authors = ["Joseph Skubal"]
 edition = "2018"
 repository  = "https://gitlab.com/skubalj/build-html"
 description = "Library for basic server-side rendering written in pure rust"
 readme = "README.md"
 license = "MIT"
+categories = ["template-engine", "web-programming"]
 keywords = ["HTML", "web"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

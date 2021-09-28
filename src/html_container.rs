@@ -117,10 +117,10 @@ pub trait HtmlContainer: Html + Sized {
     /// }
     ///
     /// let mut content = Container::default();
-    /// content.add_html(Box::new(Span::new("inner")));
+    /// content.add_html(Span::new("inner"));
     /// assert_eq!(content.to_html_string(), "<div><span>inner</span></div>");
     /// ```
-    fn add_html(&mut self, html: Box<dyn Html>);
+    fn add_html<H: Html>(&mut self, html: H);
 
     /// Consumes the container, returning it with the specified HTML element added to it
     ///
@@ -152,17 +152,23 @@ pub trait HtmlContainer: Html + Sized {
     /// }
     ///
     /// let content = Container::default()
-    ///     .with_html(Box::new(Span::new("inner")))
+    ///     .with_html(Span::new("inner"))
     ///     .to_html_string();
     /// assert_eq!(content, "<div><span>inner</span></div>");
     /// ```
-    fn with_html(mut self, html: Box<dyn Html>) -> Self {
+    #[inline]
+    fn with_html<H: Html>(mut self, html: H) -> Self {
         self.add_html(html);
         self
     }
 
     /// Add the container to this HTML Container
     ///
+    /// Under the covers, this is simply an alias for [`add_container`](HtmlContainer::add_container).
+    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply 
+    /// that this function should be preferred because it is more descriptive. `add_container` is
+    /// intended to be more of an escape hatch than something used in everyday programs.
+    /// 
     /// # Example
     /// ```
     /// # use build_html::*;
@@ -170,12 +176,18 @@ pub trait HtmlContainer: Html + Sized {
     /// content.add_container(Container::new(ContainerType::Main).with_paragraph("Inside"));
     /// assert_eq!(content.to_html_string(), "<div><main><p>Inside</p></main></div>");
     /// ```
+    #[inline]
     fn add_container(&mut self, container: Container) {
-        self.add_html(Box::new(container));
+        self.add_html(container)
     }
 
     /// Nest the specified container within this container
-    ///
+    /// 
+    /// Under the covers, this is simply an alias for [`with_container`](HtmlContainer::with_container).
+    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply 
+    /// that this function should be preferred because it is more descriptive. `with_container` is
+    /// intended to be more of an escape hatch than something used in everyday programs.
+    /// 
     /// # Example
     /// ```
     /// # use build_html::*;
@@ -192,8 +204,9 @@ pub trait HtmlContainer: Html + Sized {
     ///     "<div><h1>Content Outside</h1><main><p>Content Inside</p></main></div>"
     /// );
     /// ```
+    #[inline]
     fn with_container(self, container: Container) -> Self {
-        self.with_html(Box::new(container))
+        self.with_html(container)
     }
 
     /// Add the specified `Table` to this container
@@ -221,7 +234,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_table(&mut self, table: Table) {
-        self.add_html(Box::new(table));
+        self.add_html(table);
     }
 
     /// Nest the specified `Table` within this container
@@ -252,7 +265,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn with_table(self, table: Table) -> Self {
-        self.with_html(Box::new(table))
+        self.with_html(table)
     }
 
     /// Adds a header tag with the designated level to this container
@@ -270,7 +283,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds a header tag with the designated level to this container
@@ -290,7 +303,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds a header tag with the designated level and attributes to this container.
@@ -312,7 +325,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds a header tag with the designated level and attributes to this container.
@@ -336,7 +349,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds an `<img>` tag to this container
@@ -357,7 +370,7 @@ pub trait HtmlContainer: Html + Sized {
             alt: alt.to_string(),
             attr: Attributes::default(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds an `<img>` tag to this container
@@ -377,7 +390,7 @@ pub trait HtmlContainer: Html + Sized {
             alt: alt.to_string(),
             attr: Attributes::default(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds an `<img>` tag with the specified attributes to this container
@@ -406,7 +419,7 @@ pub trait HtmlContainer: Html + Sized {
             alt: alt.to_string(),
             attr: attr.into(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds an `<img>` tag with the specified attributes to this container
@@ -436,7 +449,7 @@ pub trait HtmlContainer: Html + Sized {
             alt: alt.to_string(),
             attr: attr.into(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds an `<a>` tag to this container
@@ -458,7 +471,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.add_html(Box::new(content))
+        self.add_html(content)
     }
 
     /// Adds an `<a>` tag to this container
@@ -478,7 +491,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds an `<a>` tag with the specified attributes to this container
@@ -504,7 +517,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds an `<a>` tag with the specified attributes to this container
@@ -531,7 +544,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds a `<p>` tag element to this Container
@@ -548,7 +561,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.add_html(Box::new(content))
+        self.add_html(content)
     }
 
     /// Adds a `<p>` tag element to this Container
@@ -567,7 +580,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds a `<p>` tag element with the specified attributes to this Container
@@ -591,7 +604,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds a `<p>` tag element with the specified attributes to this Container
@@ -614,7 +627,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds a `<pre>` tag element to this container
@@ -634,7 +647,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds a `<pre>` tag element to this container
@@ -653,7 +666,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: Attributes::default(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Adds a `<pre>` tag element with the specified attributes to this container
@@ -677,7 +690,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.add_html(Box::new(content));
+        self.add_html(content);
     }
 
     /// Adds a `<pre>` tag element with the specified attributes to this container
@@ -700,7 +713,7 @@ pub trait HtmlContainer: Html + Sized {
             content: text.to_string(),
             attr: attr.into(),
         };
-        self.with_html(Box::new(content))
+        self.with_html(content)
     }
 
     /// Add raw content to the container. This content is pasted directly into the HTML
@@ -721,9 +734,9 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_raw(&mut self, content: impl ToString) {
-        self.add_html(Box::new(BodyContent::Raw {
+        self.add_html(BodyContent::Raw {
             content: content.to_string(),
-        }));
+        });
     }
 
     /// Add raw content to this container. The content is pasted directly into the HTML
@@ -746,8 +759,8 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn with_raw(self, content: impl ToString) -> Self {
-        self.with_html(Box::new(BodyContent::Raw {
+        self.with_html(BodyContent::Raw {
             content: content.to_string(),
-        }))
+        })
     }
 }

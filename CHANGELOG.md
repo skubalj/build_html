@@ -4,6 +4,9 @@ Changelog
 ## Master
 * Refactored API, divided into "add" for mutable and "with" for chainable
 * Fixed non-generic fields which snuck by in 1.1.0
+* Refactored types to use strings instead of boxed intermediate types
+    * While we're still using the heap, we cut out one level of indirection which increases efficiency
+    * This is entirely transparent to end users
 
 ## Version 1.1.0 (2021-06-17)
 * Rise of the Generics! -- `add_x` methods are now much more flexible!
