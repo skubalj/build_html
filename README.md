@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.com/skubalj/html-gen/badges/master/pipeline.svg)](https://gitlab.com/skubalj/html-gen/-/commits/master)
+[![Rust](https://github.com/skubalj/build_html/actions/workflows/rust.yml/badge.svg)](https://github.com/skubalj/build_html/actions/workflows/rust.yml)
 
 build_html: Rust HTML Generation
 ==============================

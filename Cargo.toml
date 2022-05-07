@@ -1,9 +1,9 @@
 [package]
 name = "build_html"
-version = "2.0.0"
+version = "2.0.1"
 authors = ["Joseph Skubal"]
 edition = "2018"
-repository  = "https://gitlab.com/skubalj/build-html"
+repository  = "https://github.com/skubalj/build_html"
 description = "Library for basic server-side rendering written in pure rust"
 readme = "README.md"
 license = "MIT"

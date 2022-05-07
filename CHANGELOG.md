@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.0.1 (In Progress)
+* Migrates Repository to GitHub
+
 ## Version 2.0.0 (2021-09-27)
 * Refactored API, divided into "add" for mutable and "with" for chainable
 * Fixed non-generic fields which snuck by in 1.1.0
