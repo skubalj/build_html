@@ -107,3 +107,43 @@ impl std::fmt::Display for dyn Html {
         write!(f, "{}", self.to_html_string())
     }
 }
+
+impl Html for String {
+    fn to_html_string(&self) -> String {
+        self.clone()
+    }
+}
+
+/// Escape the provided string.
+///
+/// All HTML tags will be converted to their escaped versions. The output string should be safe to
+/// insert into an HTML document. Any embedded HTML tags will be rendered as text. It is important
+/// to *always* escape inputs from untrusted sources!
+///
+/// Implementation note: The list of escaped characters is pulled from [Svelte](https://github.com/sveltejs/svelte/blob/master/src/compiler/compile/utils/stringify.ts#L14).
+///
+/// # Example
+/// ```
+/// # use build_html::*;
+/// let html = Container::default()
+///     .with_paragraph(escape_html("My <p> element!"))
+///     .to_html_string();
+///
+/// assert_eq!(html, "<div><p>My &lt;p&gt; element!</p></div>");
+///
+/// ```
+pub fn escape_html(data: &str) -> String {
+    let mut escaped = String::with_capacity(data.len());
+    for c in data.chars() {
+        match c {
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            x => escaped.push(x),
+        }
+    }
+
+    escaped
+}
