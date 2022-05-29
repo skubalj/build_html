@@ -1,7 +1,7 @@
 //! Defines the `HtmlContainer` Trait
 
 use crate::attributes::Attributes;
-use crate::content::BodyContent;
+use crate::content;
 use crate::Container;
 use crate::Html;
 use crate::Table;
@@ -165,10 +165,10 @@ pub trait HtmlContainer: Html + Sized {
     /// Add the container to this HTML Container
     ///
     /// Under the covers, this is simply an alias for [`add_container`](HtmlContainer::add_container).
-    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply 
+    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply
     /// that this function should be preferred because it is more descriptive. `add_container` is
     /// intended to be more of an escape hatch than something used in everyday programs.
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use build_html::*;
@@ -182,12 +182,12 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Nest the specified container within this container
-    /// 
+    ///
     /// Under the covers, this is simply an alias for [`with_container`](HtmlContainer::with_container).
-    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply 
+    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply
     /// that this function should be preferred because it is more descriptive. `with_container` is
     /// intended to be more of an escape hatch than something used in everyday programs.
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use build_html::*;
@@ -278,7 +278,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content.to_html_string(), r#"<div><h1>Header Text</h1></div>"#);
     /// ```
     fn add_header(&mut self, level: u8, text: impl ToString) {
-        let content = BodyContent::Header {
+        let content = content::Header {
             level,
             content: text.to_string(),
             attr: Attributes::default(),
@@ -298,7 +298,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><h1>Header Text</h1></div>"#);
     /// ```
     fn with_header(self, level: u8, text: impl ToString) -> Self {
-        let content = BodyContent::Header {
+        let content = content::Header {
             level,
             content: text.to_string(),
             attr: Attributes::default(),
@@ -320,7 +320,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Header {
+        let content = content::Header {
             level,
             content: text.to_string(),
             attr: attr.into(),
@@ -344,7 +344,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Header {
+        let content = content::Header {
             level,
             content: text.to_string(),
             attr: attr.into(),
@@ -365,7 +365,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_image(&mut self, src: impl ToString, alt: impl ToString) {
-        let content = BodyContent::Image {
+        let content = content::Image {
             src: src.to_string(),
             alt: alt.to_string(),
             attr: Attributes::default(),
@@ -385,7 +385,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><img src="myimage.png" alt="a test image"></div>"#);
     /// ```
     fn with_image(self, src: impl ToString, alt: impl ToString) -> Self {
-        let content = BodyContent::Image {
+        let content = content::Image {
             src: src.to_string(),
             alt: alt.to_string(),
             attr: Attributes::default(),
@@ -414,7 +414,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Image {
+        let content = content::Image {
             src: src.to_string(),
             alt: alt.to_string(),
             attr: attr.into(),
@@ -444,7 +444,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Image {
+        let content = content::Image {
             src: src.to_string(),
             alt: alt.to_string(),
             attr: attr.into(),
@@ -466,7 +466,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_link(&mut self, href: impl ToString, text: impl ToString) {
-        let content = BodyContent::Link {
+        let content = content::Link {
             href: href.to_string(),
             content: text.to_string(),
             attr: Attributes::default(),
@@ -486,7 +486,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><a href="https://rust-lang.org/">Rust Homepage</a></div>"#)
     /// ```
     fn with_link(self, href: impl ToString, text: impl ToString) -> Self {
-        let content = BodyContent::Link {
+        let content = content::Link {
             href: href.to_string(),
             content: text.to_string(),
             attr: Attributes::default(),
@@ -512,7 +512,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Link {
+        let content = content::Link {
             href: href.to_string(),
             content: text.to_string(),
             attr: attr.into(),
@@ -539,7 +539,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Link {
+        let content = content::Link {
             href: href.to_string(),
             content: text.to_string(),
             attr: attr.into(),
@@ -557,7 +557,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content.to_html_string(), r#"<div><p>This is sample paragraph text</p></div>"#);
     /// ```
     fn add_paragraph(&mut self, text: impl ToString) {
-        let content = BodyContent::Paragraph {
+        let content = content::Paragraph {
             content: text.to_string(),
             attr: Attributes::default(),
         };
@@ -576,7 +576,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><p>This is sample paragraph text</p></div>"#);
     /// ```
     fn with_paragraph(self, text: impl ToString) -> Self {
-        let content = BodyContent::Paragraph {
+        let content = content::Paragraph {
             content: text.to_string(),
             attr: Attributes::default(),
         };
@@ -600,7 +600,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Paragraph {
+        let content = content::Paragraph {
             content: text.to_string(),
             attr: attr.into(),
         };
@@ -623,7 +623,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Paragraph {
+        let content = content::Paragraph {
             content: text.to_string(),
             attr: attr.into(),
         };
@@ -643,7 +643,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_preformatted(&mut self, text: impl ToString) {
-        let content = BodyContent::Preformatted {
+        let content = content::Preformatted {
             content: text.to_string(),
             attr: Attributes::default(),
         };
@@ -662,7 +662,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><pre>This | is   preformatted => text</pre></div>"#);
     /// ```
     fn with_preformatted(self, text: impl ToString) -> Self {
-        let content = BodyContent::Preformatted {
+        let content = content::Preformatted {
             content: text.to_string(),
             attr: Attributes::default(),
         };
@@ -686,7 +686,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Preformatted {
+        let content = content::Preformatted {
             content: text.to_string(),
             attr: attr.into(),
         };
@@ -709,7 +709,7 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = BodyContent::Preformatted {
+        let content = content::Preformatted {
             content: text.to_string(),
             attr: attr.into(),
         };
@@ -734,9 +734,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_raw(&mut self, content: impl ToString) {
-        self.add_html(BodyContent::Raw {
-            content: content.to_string(),
-        });
+        self.add_html(content.to_string());
     }
 
     /// Add raw content to this container. The content is pasted directly into the HTML
@@ -759,8 +757,6 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn with_raw(self, content: impl ToString) -> Self {
-        self.with_html(BodyContent::Raw {
-            content: content.to_string(),
-        })
+        self.with_html(content.to_string())
     }
 }

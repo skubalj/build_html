@@ -1,9 +1,10 @@
 //! This module contains the `HtmlPage` struct, which serves as the major entry point for the program
 
 use crate::attributes::Attributes;
-use crate::content::HeadContent;
 use crate::html_container::HtmlContainer;
 use crate::Html;
+
+mod header_content;
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
 ///
@@ -74,7 +75,7 @@ impl HtmlPage {
         self
     }
 
-    /// Adds a new link to the HTML head.
+    /// Adds a new link element to the HTML head.
     ///
     /// # Example
     /// ```
@@ -89,7 +90,7 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn add_head_link(&mut self, href: impl ToString, rel: impl ToString) {
-        self.add_html_head(HeadContent::Link {
+        self.add_html_head(header_content::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: Attributes::default(),
@@ -112,7 +113,7 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn with_head_link(self, href: impl ToString, rel: impl ToString) -> Self {
-        self.with_html_head(HeadContent::Link {
+        self.with_html_head(header_content::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: Attributes::default(),
@@ -138,7 +139,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.add_html_head(HeadContent::Link {
+        self.add_html_head(header_content::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: attr.into(),
@@ -165,7 +166,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.with_html_head(HeadContent::Link {
+        self.with_html_head(header_content::Link {
             href: href.to_string(),
             rel: rel.to_string(),
             attr: attr.into(),
@@ -193,7 +194,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.add_html_head(HeadContent::Meta {
+        self.add_html_head(header_content::Meta {
             attr: attributes.into(),
         })
     }
@@ -221,7 +222,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.with_html_head(HeadContent::Meta {
+        self.with_html_head(header_content::Meta {
             attr: attributes.into(),
         })
     }
@@ -241,7 +242,7 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn add_script_link(&mut self, src: impl ToString) {
-        self.add_html_head(HeadContent::ScriptLink {
+        self.add_html_head(header_content::ScriptLink {
             src: src.to_string(),
             attr: Attributes::default(),
         })
@@ -263,7 +264,7 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn with_script_link(self, src: impl ToString) -> Self {
-        self.with_html_head(HeadContent::ScriptLink {
+        self.with_html_head(header_content::ScriptLink {
             src: src.to_string(),
             attr: Attributes::default(),
         })
@@ -275,7 +276,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.add_html_head(HeadContent::ScriptLink {
+        self.add_html_head(header_content::ScriptLink {
             src: src.to_string(),
             attr: attributes.into(),
         })
@@ -287,7 +288,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.with_html_head(HeadContent::ScriptLink {
+        self.with_html_head(header_content::ScriptLink {
             src: src.to_string(),
             attr: attributes.into(),
         })
@@ -317,7 +318,7 @@ impl HtmlPage {
     /// page.add_script_literal(include_str!("myScript.js"));
     /// ```
     pub fn add_script_literal(&mut self, code: impl ToString) {
-        self.add_html_head(HeadContent::ScriptLiteral {
+        self.add_html_head(header_content::ScriptLiteral {
             code: code.to_string(),
         })
     }
@@ -348,7 +349,7 @@ impl HtmlPage {
     ///     .to_html_string();
     /// ```
     pub fn with_script_literal(self, code: impl ToString) -> Self {
-        self.with_html_head(HeadContent::ScriptLiteral {
+        self.with_html_head(header_content::ScriptLiteral {
             code: code.to_string(),
         })
     }
@@ -376,7 +377,7 @@ impl HtmlPage {
     /// page.add_style(include_str!("styles.css"));
     /// ```
     pub fn add_style(&mut self, css: impl ToString) {
-        self.add_html_head(HeadContent::Style {
+        self.add_html_head(header_content::Style {
             css: css.to_string(),
             attr: Attributes::default(),
         })
@@ -407,7 +408,7 @@ impl HtmlPage {
     ///     .to_html_string();
     /// ```
     pub fn with_style(self, css: impl ToString) -> Self {
-        self.with_html_head(HeadContent::Style {
+        self.with_html_head(header_content::Style {
             css: css.to_string(),
             attr: Attributes::default(),
         })
@@ -419,7 +420,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.add_html_head(HeadContent::Style {
+        self.add_html_head(header_content::Style {
             css: css.to_string(),
             attr: attributes.into(),
         })
@@ -431,7 +432,7 @@ impl HtmlPage {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.with_html_head(HeadContent::Style {
+        self.with_html_head(header_content::Style {
             css: css.to_string(),
             attr: attributes.into(),
         })
@@ -495,7 +496,7 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn add_title(&mut self, title_text: impl ToString) {
-        self.add_html_head(HeadContent::Title {
+        self.add_html_head(header_content::Title {
             content: title_text.to_string(),
         })
     }
@@ -516,7 +517,7 @@ impl HtmlPage {
     /// ));
     /// ```
     pub fn with_title(self, title_text: impl ToString) -> Self {
-        self.with_html_head(HeadContent::Title {
+        self.with_html_head(header_content::Title {
             content: title_text.to_string(),
         })
     }

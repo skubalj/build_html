@@ -1,8 +1,10 @@
 Changelog
 =========
 
-## Version 2.0.1 (In Progress)
+## Version 2.1.0 (In Progress)
 * Migrates Repository to GitHub
+* Adds function to escape HTML strings
+* Internal Improvements
 
 ## Version 2.0.0 (2021-09-27)
 * Refactored API, divided into "add" for mutable and "with" for chainable
