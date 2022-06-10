@@ -18,7 +18,7 @@ This crate is written in purely safe Rust with no production dependencies.
 Everything you need to use this crate has been exported from the crate root. This means that
 you can get easy access to every element using the import: `use build_html::*`.
 
-If compatibility is important, or you don't need access to every element, you can also import 
+While the easiest way to use the library is with a root import, you can also import items
 piecemeal and prefix types with the package name. Note that the traits `Html` and 
 `HtmlContainer` must be in scope for the library to be useful: 
 ```rust
@@ -109,8 +109,6 @@ This project was made possible thanks to the following great projects:
 * [Rust](https://rust-lang.org)
 
 ## License
-This project is licensed under the [MIT license](https://mit-license.org). In other words, it's
-free for you to use for whatever purpose you want. However, to the maximum extent allowed under the
-law, this software has NO WARRANTY.
+This project is licensed under the [MIT license](https://mit-license.org).
 
-Copyright (C) 2020-21 Joseph Skubal
+Copyright (C) 2020-22 Joseph Skubal

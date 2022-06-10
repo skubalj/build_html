@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Version 2.1.0 (In Progress)
+## Version 2.1.0 (2022-06-09)
 * Migrates Repository to GitHub
 * Adds function to escape HTML strings
 * Internal Improvements to reduce the number of memory allocations used
