@@ -73,7 +73,7 @@ impl Display for ContainerType {
 #[derive(Debug)]
 pub struct Container {
     tag: ContainerType,
-    elements: Vec<String>,
+    elements: String,
     attr: Attributes,
 }
 
@@ -83,7 +83,7 @@ impl Html for Container {
             "<{tag}{attr}>{content}</{tag}>",
             tag = self.tag,
             attr = self.attr,
-            content = self.elements.join(""),
+            content = self.elements,
         )
     }
 }
@@ -91,14 +91,14 @@ impl Html for Container {
 impl HtmlContainer for Container {
     #[inline]
     fn add_html<H: Html>(&mut self, content: H) {
-        let content: String = match self.tag {
+        match self.tag {
             ContainerType::OrderedList | ContainerType::UnorderedList => {
-                format!("<li>{}</li>", content.to_html_string())
+                self.elements.push_str("<li>");
+                self.elements.push_str(content.to_html_string().as_str());
+                self.elements.push_str("</li>");
             }
-            _ => content.to_html_string(),
+            _ => self.elements.push_str(content.to_html_string().as_str()),
         };
-
-        self.elements.push(content);
     }
 }
 
@@ -113,7 +113,7 @@ impl Container {
     pub fn new(tag: ContainerType) -> Self {
         Container {
             tag,
-            elements: Vec::new(),
+            elements: String::new(),
             attr: Attributes::default(),
         }
     }

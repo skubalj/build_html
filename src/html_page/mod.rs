@@ -26,16 +26,15 @@ mod header_content;
 /// ```
 #[derive(Debug)]
 pub struct HtmlPage {
-    head: Vec<String>,
-    body: Vec<String>,
+    head: String,
+    body: String,
 }
 
 impl Html for HtmlPage {
     fn to_html_string(&self) -> String {
         format!(
             "<!DOCTYPE html><html><head>{}</head><body>{}</body></html>",
-            self.head.join(""),
-            self.body.join("")
+            self.head, self.body
         )
     }
 }
@@ -43,7 +42,7 @@ impl Html for HtmlPage {
 impl HtmlContainer for HtmlPage {
     #[inline]
     fn add_html<H: Html>(&mut self, html: H) {
-        self.body.push(html.to_html_string());
+        self.body.push_str(html.to_html_string().as_str());
     }
 }
 
@@ -57,15 +56,15 @@ impl HtmlPage {
     /// Creates a new HTML page with no content
     pub fn new() -> Self {
         HtmlPage {
-            head: Vec::new(),
-            body: Vec::new(),
+            head: String::new(),
+            body: String::new(),
         }
     }
 
     /// Helper function similar to [`HtmlContainer::add_html`]
     #[inline]
     fn add_html_head<H: Html>(&mut self, html: H) {
-        self.head.push(html.to_html_string());
+        self.head.push_str(html.to_html_string().as_str());
     }
 
     /// Helper function similar to [`HtmlContainer::with_html`]

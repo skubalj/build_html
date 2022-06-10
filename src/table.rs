@@ -5,24 +5,25 @@
 
 use crate::attributes::Attributes;
 use crate::Html;
-use std::fmt::Display;
+use std::fmt::{Display, Write};
 
 /// Parse the provided slice of elements into a table row
-fn parse_table_row<T>(row: T, cell_tag: &str) -> String
+fn write_table_row<T>(aggregator: &mut String, row: T, cell_tag: &str)
 where
     T: IntoIterator,
     T::Item: Display,
 {
-    row.into_iter()
-        .map(|element| {
-            format!(
-                "<{tag}>{content}</{tag}>",
-                tag = cell_tag,
-                content = element
-            )
-        })
-        .chain(std::iter::once("</tr>".into()))
-        .fold(String::from("<tr>"), |a, n| a + &n)
+    aggregator.push_str("<tr>");
+    for element in row.into_iter() {
+        write!(
+            aggregator,
+            "<{tag}>{content}</{tag}>",
+            tag = cell_tag,
+            content = element
+        )
+        .unwrap();
+    }
+    aggregator.push_str("</tr>");
 }
 
 /// Represents an HTML `<table>` element with all its children.
@@ -56,10 +57,10 @@ where
 ///     )
 /// );
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Table {
-    thead: Vec<String>,
-    tbody: Vec<String>,
+    thead: String,
+    tbody: String,
     attr: Attributes,
 }
 
@@ -68,15 +69,9 @@ impl Html for Table {
         format!(
             "<table{attr}><thead>{thead}</thead><tbody>{tbody}</tbody></table>",
             attr = self.attr,
-            thead = self.thead.join(""),
-            tbody = self.tbody.join(""),
+            thead = self.thead,
+            tbody = self.tbody,
         )
-    }
-}
-
-impl Default for Table {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -87,13 +82,13 @@ where
     <<T as std::iter::IntoIterator>::Item as IntoIterator>::Item: Display,
 {
     fn from(source: T) -> Self {
-        let body_rows = source
-            .into_iter()
-            .map(|row| parse_table_row(row, "td"))
-            .collect();
+        let mut body = String::new();
+        for row in source.into_iter() {
+            write_table_row(&mut body, row, "td");
+        }
         Table {
-            thead: Vec::new(),
-            tbody: body_rows,
+            thead: String::new(),
+            tbody: body,
             attr: Attributes::default(),
         }
     }
@@ -102,11 +97,7 @@ where
 impl Table {
     /// Creates a new table with an empty header and body
     pub fn new() -> Self {
-        Table {
-            thead: Vec::new(),
-            tbody: Vec::new(),
-            attr: Attributes::default(),
-        }
+        Self::default()
     }
 
     /// Associates the specified map of attributes with this `Table`.
@@ -182,7 +173,7 @@ impl Table {
         T: IntoIterator,
         T::Item: Display,
     {
-        self.thead.push(parse_table_row(row, "th"));
+        write_table_row(&mut self.thead, row, "th");
     }
 
     /// Adds the specified row to the table header
@@ -210,7 +201,7 @@ impl Table {
         T: IntoIterator,
         T::Item: Display,
     {
-        self.thead.push(parse_table_row(row, "th"));
+        self.add_header_row(row);
         self
     }
 
@@ -238,7 +229,7 @@ impl Table {
         T: IntoIterator,
         T::Item: Display,
     {
-        self.tbody.push(parse_table_row(row, "td"));
+        write_table_row(&mut self.tbody, row, "td");
     }
 
     /// Adds the specified row to the table body
@@ -266,7 +257,7 @@ impl Table {
         T: IntoIterator,
         T::Item: Display,
     {
-        self.tbody.push(parse_table_row(row, "td"));
+        self.add_body_row(row);
         self
     }
 }

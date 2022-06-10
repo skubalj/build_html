@@ -1,11 +1,12 @@
 //! Various tags that can be used in the header of an HTML document
-//! 
-//! This module is not publicly exported, as the types are only for internal use. Modifications 
+//!
+//! This module is not publicly exported, as the types are only for internal use. Modifications
 //! can be made to this file in a patch-level release.
 
 use crate::attributes::Attributes;
 use crate::Html;
 
+/// An HTML link element
 #[derive(Debug, Clone)]
 pub struct Link {
     pub href: String,

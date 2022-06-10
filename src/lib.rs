@@ -97,7 +97,7 @@ pub trait Html: std::fmt::Debug {
     ///     .with_paragraph("My p element")
     ///     .to_html_string();
     ///
-    /// assert_eq!(html, "<div><p>My p element</p></div>")
+    /// assert_eq!(html, "<div><p>My p element</p></div>");
     /// ```
     fn to_html_string(&self) -> String;
 }
@@ -111,6 +111,12 @@ impl std::fmt::Display for dyn Html {
 impl Html for String {
     fn to_html_string(&self) -> String {
         self.clone()
+    }
+}
+
+impl Html for &str {
+    fn to_html_string(&self) -> String {
+        self.to_string()
     }
 }
 
