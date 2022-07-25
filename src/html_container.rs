@@ -164,9 +164,9 @@ pub trait HtmlContainer: Html + Sized {
 
     /// Add the container to this HTML Container
     ///
-    /// Under the covers, this is simply an alias for [`add_container`](HtmlContainer::add_container).
+    /// Under the covers, this is simply an alias for [`add_html`](HtmlContainer::add_html).
     /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply
-    /// that this function should be preferred because it is more descriptive. `add_container` is
+    /// that this function should be preferred because it is more descriptive. `add_html` is
     /// intended to be more of an escape hatch than something used in everyday programs.
     ///
     /// # Example
@@ -183,9 +183,9 @@ pub trait HtmlContainer: Html + Sized {
 
     /// Nest the specified container within this container
     ///
-    /// Under the covers, this is simply an alias for [`with_container`](HtmlContainer::with_container).
+    /// Under the covers, this is simply an alias for [`with_html`](HtmlContainer::with_html).
     /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply
-    /// that this function should be preferred because it is more descriptive. `with_container` is
+    /// that this function should be preferred because it is more descriptive. `with_html` is
     /// intended to be more of an escape hatch than something used in everyday programs.
     ///
     /// # Example
