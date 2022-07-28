@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.1.1 (2022-07-27)
+* Documentation fix, courtesy of Kevin Kuriakose (@Technohacker)
+
 ## Version 2.1.0 (2022-06-09)
 * Migrates Repository to GitHub
 * Adds function to escape HTML strings
