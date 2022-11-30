@@ -103,6 +103,11 @@ can achieve this using one of two escape hatches.
 1. You can implement your own HTML types and add them using `HtmlContainer::add_html`
 2. You can add one-off raw content using `HtmlContainer::add_raw`
 
+## Contributing
+If you have an idea for making this library better, feel free to open an issue or pull request on 
+GitHub! I try to respond within a reasonable amount of time, but please keep in mind that
+maintaining this library is not my full time job.
+
 ## Acknowledgment
 This project was made possible thanks to the following great projects:
 * [test-case](https://crates.io/crates/test-case): Marcin Sas-Szymanski, Wojciech Polak
@@ -111,4 +116,4 @@ This project was made possible thanks to the following great projects:
 ## License
 This project is licensed under the [MIT license](https://mit-license.org).
 
-Copyright (C) 2020-22 Joseph Skubal
+Copyright (C) 2020-22 Joseph Skubal and Contributors

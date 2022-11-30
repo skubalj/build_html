@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.2.0 (2022-11-30)
+* Additional container types, courtesy of Christoffer (@ChrisTheDevel)
+
 ## Version 2.1.1 (2022-07-27)
 * Documentation fix, courtesy of Kevin Kuriakose (@Technohacker)
 
