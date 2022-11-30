@@ -26,6 +26,10 @@ pub enum ContainerType {
     OrderedList,
     /// Corresponds to `<ul>` tags
     UnorderedList,
+    /// Corresponts to `<nav>` tags
+    Nav,
+    /// Corresponts to `<section>` tags
+    Section,
 }
 
 impl Display for ContainerType {
@@ -39,6 +43,8 @@ impl Display for ContainerType {
             Self::Main => write!(f, "main"),
             Self::OrderedList => write!(f, "ol"),
             Self::UnorderedList => write!(f, "ul"),
+            Self::Nav => write!(f, "nav"),
+            Self::Section => write!(f, "section"),
         }
     }
 }
