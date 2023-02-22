@@ -25,6 +25,9 @@ piecemeal and prefix types with the package name. Note that the traits `Html` an
 use build_html::{self, Html, HtmlContainer};
 
 let page = build_html::HtmlPage::new()
+    .doctype_html5() // Change the doctype to use HTML5
+    .doctype_xhtml() // Change the doctype to  XHTML 1.0
+    .html_xml() // Change the `<html>` tag to `<html xmlns="http://www.w3.org/1999/xhtml">`
     .with_paragraph("Some Text")
     .to_html_string();
 ```

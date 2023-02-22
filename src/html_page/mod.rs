@@ -4,7 +4,9 @@ use crate::attributes::Attributes;
 use crate::html_container::HtmlContainer;
 use crate::Html;
 
+mod constants;
 mod header_content;
+pub use constants::*;
 
 /// This struct represents an entire page of HTML which can built up by chaining addition methods.
 ///
@@ -26,6 +28,8 @@ mod header_content;
 /// ```
 #[derive(Debug)]
 pub struct HtmlPage {
+    doctype: String,
+    html: String,
     head: String,
     body: String,
 }
@@ -33,8 +37,8 @@ pub struct HtmlPage {
 impl Html for HtmlPage {
     fn to_html_string(&self) -> String {
         format!(
-            "<!DOCTYPE html><html><head>{}</head><body>{}</body></html>",
-            self.head, self.body
+            "{}{}<head>{}</head><body>{}</body></html>",
+            self.doctype, self.html, self.head, self.body
         )
     }
 }
@@ -48,17 +52,54 @@ impl HtmlContainer for HtmlPage {
 
 impl Default for HtmlPage {
     fn default() -> Self {
-        HtmlPage::new()
+        HtmlPage {
+            doctype: HTML5.to_owned(),
+            html: HTML_PLAIN_TAG.to_owned(),
+            head: String::new(),
+            body: String::new(),
+        }
     }
 }
 
 impl HtmlPage {
     /// Creates a new HTML page with no content
     pub fn new() -> Self {
-        HtmlPage {
-            head: String::new(),
-            body: String::new(),
-        }
+        HtmlPage::default()
+    }
+
+    /// Change the doctype to something custom
+    pub fn custom_doctype(&mut self, doctype: &str) -> &mut Self {
+        self.doctype = doctype.to_owned();
+
+        self
+    }
+
+    /// Change the `<html>` tag to something with custom attributes
+    pub fn custom_html_tag(&mut self, html_tag_attribute: &str) -> &mut Self {
+        self.html = html_tag_attribute.to_owned();
+
+        self
+    }
+
+    /// Convert doctype to HTML5
+    pub fn doctype_html5(&mut self) -> &mut Self {
+        self.doctype = HTML5.to_owned();
+
+        self
+    }
+
+    /// Convert doctype to XHTML which is very useful for legacy compatibility for example with HTML email clients
+    pub fn doctype_xhtml(&mut self) -> &mut Self {
+        self.doctype = XHTML_1_DOT_0.to_owned();
+
+        self
+    }
+
+    /// Convert `<html>` tag to have XML attribute which is very useful for legacy compatibility for example with HTML email clients
+    pub fn html_xml(&mut self) -> &mut Self {
+        self.html = HTML_XML.to_owned();
+
+        self
     }
 
     /// Helper function similar to [`HtmlContainer::add_html`]

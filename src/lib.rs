@@ -77,7 +77,7 @@ mod table;
 // Exports for the `use build_html::*` syntax
 pub use self::container::{Container, ContainerType};
 pub use self::html_container::HtmlContainer;
-pub use self::html_page::HtmlPage;
+pub use self::html_page::*;
 pub use self::table::Table;
 
 /// An element that can be converted to an HTML string
