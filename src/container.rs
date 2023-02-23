@@ -5,8 +5,9 @@ use crate::html_container::HtmlContainer;
 use crate::Html;
 use std::fmt::{self, Display};
 
-/// The different types of Html Containers that can be added to the page
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+/// The different types of HTML containers that can be added to the page
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[non_exhaustive]
 pub enum ContainerType {
     /// Corresponds to `<address>` tags
     Address,
@@ -15,6 +16,7 @@ pub enum ContainerType {
     /// Corresponds to `<div>` tags
     ///
     /// This type is also the default for `Container`s
+    #[default]
     Div,
     /// Corresponds to `<footer>` tags
     Footer,
@@ -76,7 +78,7 @@ impl Display for ContainerType {
 ///     "<main><h1>My Container</h1><article><div><p>Inner Text</p></div></article></main>"
 /// );
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Container {
     tag: ContainerType,
     elements: String,
@@ -105,12 +107,6 @@ impl HtmlContainer for Container {
             }
             _ => self.elements.push_str(content.to_html_string().as_str()),
         };
-    }
-}
-
-impl Default for Container {
-    fn default() -> Self {
-        Container::new(ContainerType::Div)
     }
 }
 
