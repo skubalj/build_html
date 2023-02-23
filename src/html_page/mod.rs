@@ -5,8 +5,11 @@ use crate::html_container::HtmlContainer;
 use crate::Html;
 
 mod header_content;
+mod version;
 
-/// This struct represents an entire page of HTML which can built up by chaining addition methods.
+pub use version::HtmlVersion;
+
+/// An entire page of HTML which can built up by chaining addition methods.
 ///
 /// To convert an `HtmlPage` to a [`String`] which can be sent back to a client, use the
 /// [`Html::to_html_string()`] method
@@ -24,8 +27,9 @@ mod header_content;
 ///     "<body><h1>Header Text</h1></body></html>"
 /// ));
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct HtmlPage {
+    version: version::HtmlVersion,
     head: String,
     body: String,
 }
@@ -33,8 +37,11 @@ pub struct HtmlPage {
 impl Html for HtmlPage {
     fn to_html_string(&self) -> String {
         format!(
-            "<!DOCTYPE html><html><head>{}</head><body>{}</body></html>",
-            self.head, self.body
+            "{}<html{}><head>{}</head><body>{}</body></html>",
+            self.version.doctype(),
+            self.version.html_attrs(),
+            self.head,
+            self.body,
         )
     }
 }
@@ -46,16 +53,29 @@ impl HtmlContainer for HtmlPage {
     }
 }
 
-impl Default for HtmlPage {
-    fn default() -> Self {
-        HtmlPage::new()
-    }
-}
-
 impl HtmlPage {
     /// Creates a new HTML page with no content
     pub fn new() -> Self {
+        Self::with_version(HtmlVersion::HTML5)
+    }
+
+    /// Create a new HTML page with the specified version.
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::{Html, HtmlPage, HtmlVersion};
+    /// assert_eq!(
+    ///     HtmlPage::with_version(HtmlVersion::HTML4).to_html_string(),
+    ///     concat!(
+    ///         r#"<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "#,
+    ///         r#""http://www.w3.org/TR/HTML4/loose.dtd">"#,
+    ///         "<html><head></head><body></body></html>",
+    ///     ),
+    /// )
+    /// ```
+    pub fn with_version(version: HtmlVersion) -> Self {
         HtmlPage {
+            version,
             head: String::new(),
             body: String::new(),
         }
