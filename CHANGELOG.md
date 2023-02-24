@@ -1,6 +1,15 @@
 Changelog
 =========
 
+## Version 2.3.0 (2023-02-??)
+* Support for (X)HTML versions beyond HTML5, thanks to XORAPPS (@xorapps)
+* Support for attributes in `thead`, `tbody`, `tr`, `th`, and `td`.
+    * This was done by introducing the `TableRow`, `TableCell`, and `TableCellType` types.
+    * To simplify implementation, these new types are being used internally, which may slightly
+      negatively impact performance.
+* Minor internal improvements for defaults
+* Cleaned up some documentation
+
 ## Version 2.2.0 (2022-11-30)
 * Additional container types, courtesy of Christoffer (@ChrisTheDevel)
 

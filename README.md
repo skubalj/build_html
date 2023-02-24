@@ -39,7 +39,7 @@ generic on the `ToString` trait, allowing many useful types to be used. Addition
 parameters (such as `id` or `class` attributes) can be added by passing in some type implementing 
 the `IntoIterator` trait which has items which are 2-tuples of objects implementing `ToString`. 
 This means that you can use anything from a `HashMap<String, String>` to a `Vec<(&str, &str)>` to 
-(new with Rust 1.53) arrays of 2-tuples of static strings. 
+arrays of 2-tuples of static strings. 
 
 ```rust
 use build_html::*;
@@ -88,7 +88,7 @@ Currently, this library supports adding the following HTML features / tags:
 * Lists (`<li>`, `<ol>`)
 * Paragraphs (`<p>`)
 * Preformatted Text (`<pre>`)
-* Tables (`<table>`)
+* Tables (`<table>`, `<tr>`, `<th>`, `<td>`)
 
 ### Header Elements
 * Links (`<link>`)
@@ -116,4 +116,4 @@ This project was made possible thanks to the following great projects:
 ## License
 This project is licensed under the [MIT license](https://mit-license.org).
 
-Copyright (C) 2020-22 Joseph Skubal and Contributors
+Copyright (C) 2020-23 Joseph Skubal and Contributors
