@@ -78,7 +78,7 @@ mod table;
 pub use self::container::{Container, ContainerType};
 pub use self::html_container::HtmlContainer;
 pub use self::html_page::{HtmlPage, HtmlVersion};
-pub use self::table::Table;
+pub use self::table::{Table, TableCell, TableCellType, TableRow};
 
 /// An element that can be converted to an HTML string
 ///
