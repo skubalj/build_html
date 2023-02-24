@@ -102,7 +102,7 @@ impl Table {
 
     /// Associates the specified map of attributes with this `Table`.
     ///
-    /// Note that this operation overrides all previous `with_attribute` calls on
+    /// Note that this operation overrides all previous `add_attributes` calls on
     /// this `Table`
     ///
     /// # Example
@@ -126,7 +126,7 @@ impl Table {
 
     /// Associates the specified map of attributes with this `Table`.
     ///
-    /// Note that this operation overrides all previous `with_attribute` calls on
+    /// Note that this operation overrides all previous `with_attributes` calls on
     /// this `Table`
     ///
     /// # Example
@@ -146,7 +146,7 @@ impl Table {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.attr = Attributes::from(attributes);
+        self.add_attributes(attributes);
         self
     }
 
@@ -265,6 +265,7 @@ impl Table {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{Container, ContainerType, Html, HtmlContainer};
 
     #[test]
     fn test_from_arr() {
@@ -306,5 +307,60 @@ mod tests {
                 "</tbody></table>"
             )
         )
+    }
+
+    #[test]
+    fn test_inner_html() {
+        // Arrange
+        let table = Table::from([
+            [
+                Container::default()
+                    .with_paragraph("This_is_column_one")
+                    .to_html_string(),
+                Container::new(ContainerType::Article)
+                    .with_paragraph("This_is_column_two")
+                    .to_html_string(),
+            ],
+            [
+                Container::default().to_html_string(),
+                Container::default()
+                    .with_table(Table::from([[1, 2], [3, 4]]))
+                    .to_html_string(),
+            ],
+        ]);
+
+        let expected = "<table>
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <td><div><p>This_is_column_one</p></div></td>
+                        <td><article><p>This_is_column_two</p></article></td>
+                    </tr>
+                    <tr>
+                        <td><div></div></td>
+                        <td><div><table>
+                            <thead></thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>4</td>
+                                </tr>
+                            </tbody>
+                        </table></div></td>
+                    </tr>
+                </tbody>
+            </table>";
+
+        assert_eq!(
+            table.to_html_string(),
+            expected
+                .chars()
+                .filter(|x| !x.is_ascii_whitespace())
+                .collect::<String>()
+        );
     }
 }

@@ -6,16 +6,12 @@ use std::fmt::Write;
 use std::iter::FromIterator;
 
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
-pub struct Attributes {
-    attributes: String,
-}
+pub struct Attributes(String);
 
 impl fmt::Display for Attributes {
     /// Converts this set of `Attributes` to an attribute string.
-    ///
-    /// Note that the attributes are automatically sorted.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.attributes)
+        f.write_str(&self.0)
     }
 }
 
@@ -26,7 +22,7 @@ impl<I: IntoIterator<Item = (S, S)>, S: ToString> From<I> for Attributes {
             write!(attributes, r#" {}="{}""#, k.to_string(), v.to_string())
                 .expect("Failed to write into String");
         }
-        Self { attributes }
+        Self(attributes)
     }
 }
 
