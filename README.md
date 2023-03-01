@@ -16,7 +16,7 @@ This crate is written in purely safe Rust with no production dependencies.
 
 ## Use
 Everything you need to use this crate has been exported from the crate root. This means that
-you can get easy access to every element using the import: `use build_html::*`.
+you can get easy access to every element using the import: `use build_html::*;`.
 
 While the easiest way to use the library is with a root import, you can also import items
 piecemeal and prefix types with the package name. Note that the traits `Html` and 
@@ -73,6 +73,11 @@ produces a string equivalent to:
     </body>
 </html>
 ```
+
+If you are trying to create a more complicated document, you may find it easier to create a
+template from outside of Rust and build it into the binary with the `include_str!()` macro. Then,
+you can generate the parts that need to be dynamically created with `build_html` and insert them 
+with the `format!()` macro.
 
 ## Supported Features
 This library does not intend to support *all* tags and features from the HTML specification.

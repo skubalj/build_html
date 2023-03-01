@@ -1,9 +1,10 @@
 //! This library is designed to provide a simple way to generate HTML documents from within Rust
 //! code. To generate documents, this library uses the builder pattern; calls to add elements are
 //! repeatedly chained together to dynamically build up an HTML document. The document is then
-//! flushed to an HTML string which can be used elsewhere in your program with `to_html_string()`
+//! flushed to an HTML string which can be used elsewhere in your program with
+//! [`to_html_string()`](Html::to_html_string)
 //!
-//! # Using
+//! # Use
 //! Everything you need to use this crate has been exported from the crate root. This means that
 //! you can get easy access to every element using the import: `use build_html::*`.
 //!

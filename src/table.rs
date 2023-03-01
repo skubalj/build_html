@@ -66,7 +66,7 @@ impl HtmlContainer for TableCell {
 }
 
 impl TableCell {
-    // Create a new TableCell with the given type
+    /// Create a new TableCell with the given type
     pub fn new(cell_type: TableCellType) -> Self {
         Self {
             cell_type,
@@ -152,7 +152,7 @@ impl TableRow {
     ///     .with_attributes([("id", "first-row"), ("class", "table-rows")])
     ///     .with_cell(TableCell::default())
     ///     .to_html_string();
-    /// assert_eq!(out, r#"<tr id="first-row" class="table-rows"><td></td></tr>"#)
+    /// assert_eq!(out, r#"<tr id="first-row" class="table-rows"><td></td></tr>"#);
     /// ```
     pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -163,10 +163,29 @@ impl TableRow {
         self
     }
 
+    /// Add a cell to this row.
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
+    /// let mut out = TableRow::new();
+    /// out.add_cell(TableCell::default().with_paragraph("Hello, World!"));
+    /// assert_eq!(out.to_html_string(), "<tr><td><p>Hello, World!</p></td></tr>");
+    /// ```
     pub fn add_cell(&mut self, cell: TableCell) {
         self.content.push_str(&cell.to_html_string());
     }
 
+    /// Nest the given cell inside this row
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
+    /// let out = TableRow::new()
+    ///     .with_cell(TableCell::default().with_paragraph("Hello, World!"))
+    ///     .to_html_string();
+    /// assert_eq!(out, "<tr><td><p>Hello, World!</p></td></tr>");
+    /// ```
     pub fn with_cell(mut self, cell: TableCell) -> Self {
         self.add_cell(cell);
         self
