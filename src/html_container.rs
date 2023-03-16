@@ -224,7 +224,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(
     ///     container.to_html_string(),
     ///     concat!(
-    ///         "<div><table><thead>",
+    ///         "<div><table><caption></caption><thead>",
     ///         "<tr><th>A</th><th>B</th><th>C</th></tr>",
     ///         "</thead><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td></tr>",
@@ -255,7 +255,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(
     ///     content,
     ///     concat!(
-    ///         "<div><table><thead>",
+    ///         "<div><table><caption></caption><thead>",
     ///         "<tr><th>A</th><th>B</th><th>C</th></tr>",
     ///         "</thead><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td></tr>",

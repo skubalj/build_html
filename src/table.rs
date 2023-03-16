@@ -218,7 +218,7 @@ impl TableRow {
 /// assert_eq!(
 ///     html_table,
 ///     concat!(
-///         "<table><thead>",
+///         "<table><caption></caption><thead>",
 ///         "<tr><th>A</th><th>B</th><th>C</th></tr>",
 ///         "</thead><tbody>",
 ///         "<tr><td>1</td><td>2</td><td>3</td></tr>",
@@ -232,6 +232,7 @@ impl TableRow {
 pub struct Table {
     thead: String,
     tbody: String,
+    caption: String,
     table_attr: Attributes,
     thead_attr: Attributes,
     tbody_attr: Attributes,
@@ -242,11 +243,13 @@ impl Html for Table {
         format!(
             concat!(
                 "<table{table_attr}>",
+                "<caption>{caption}</caption>",
                 "<thead{thead_attr}>{thead}</thead>",
                 "<tbody{tbody_attr}>{tbody}</tbody>",
                 "</table>",
             ),
             table_attr = self.table_attr,
+            caption = self.caption,
             thead_attr = self.thead_attr,
             thead = self.thead,
             tbody_attr = self.tbody_attr,
@@ -287,7 +290,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     r#"<table id="my-table"><thead></thead><tbody></tbody></table>"#
+    ///     r#"<table id="my-table"><caption></caption><thead></thead><tbody></tbody></table>"#
     /// );
     /// ```
     pub fn add_attributes<A, S>(&mut self, attributes: A)
@@ -312,7 +315,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table,
-    ///     r#"<table id="my-table"><thead></thead><tbody></tbody></table>"#
+    ///     r#"<table id="my-table"><caption></caption><thead></thead><tbody></tbody></table>"#
     /// );
     /// ```
     pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
@@ -337,7 +340,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     r#"<table><thead id="table-header"></thead><tbody></tbody></table>"#
+    ///     r#"<table><caption></caption><thead id="table-header"></thead><tbody></tbody></table>"#
     /// );
     /// ```
     pub fn add_thead_attributes<A, S>(&mut self, attributes: A)
@@ -363,7 +366,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table,
-    ///     r#"<table id="my-table"><thead id="my-thead"></thead><tbody></tbody></table>"#
+    ///     r#"<table id="my-table"><caption></caption><thead id="my-thead"></thead><tbody></tbody></table>"#
     /// );
     /// ```
     pub fn with_thead_attributes<A, S>(mut self, attributes: A) -> Self
@@ -372,6 +375,28 @@ impl Table {
         S: ToString,
     {
         self.add_thead_attributes(attributes);
+        self
+    }
+
+    /// Associates the caption as content of caption tag
+    ///
+    /// Note that this operation overrides all previous `with_caption` calls on
+    /// this `Table`
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
+    /// let table = Table::new()
+    ///     .with_caption("caption")
+    ///     .to_html_string();
+    ///
+    /// assert_eq!(
+    ///     table,
+    ///     r#"<table><caption>caption</caption><thead></thead><tbody></tbody></table>"#
+    /// );
+    /// ```
+    pub fn with_caption(mut self, caption: impl ToString) -> Self {
+        self.caption = caption.to_string();
         self
     }
 
@@ -388,7 +413,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     r#"<table><thead></thead><tbody id="table-body"></tbody></table>"#
+    ///     r#"<table><caption></caption><thead></thead><tbody id="table-body"></tbody></table>"#
     /// );
     /// ```
     pub fn add_tbody_attributes<A, S>(&mut self, attributes: A)
@@ -414,7 +439,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table,
-    ///     r#"<table id="my-table"><thead></thead><tbody id="my-body"></tbody></table>"#
+    ///     r#"<table id="my-table"><caption></caption><thead></thead><tbody id="my-body"></tbody></table>"#
     /// );
     /// ```
     pub fn with_tbody_attributes<A, S>(mut self, attributes: A) -> Self
@@ -438,7 +463,7 @@ impl Table {
     /// assert_eq!(
     ///     table.to_html_string(),
     ///     concat!(
-    ///         "<table><thead>",
+    ///         "<table><caption></caption><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
     ///         "</thead><tbody></tbody></table>"
     ///     )
@@ -468,7 +493,7 @@ impl Table {
     /// assert_eq!(
     ///     table,
     ///     concat!(
-    ///         "<table><thead>",
+    ///         "<table><caption></caption><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
     ///         "</thead><tbody></tbody></table>"
     ///     )
@@ -499,7 +524,7 @@ impl Table {
     /// assert_eq!(
     ///     table.to_html_string(),
     ///     concat!(
-    ///         "<table><thead>",
+    ///         "<table><caption></caption><thead>",
     ///         "<tr><th>col1</th><th>col2</th><th>col3</th></tr>",
     ///         "</thead><tbody></tbody></table>",
     ///     ),
@@ -531,7 +556,7 @@ impl Table {
     /// assert_eq!(
     ///     table,
     ///     concat!(
-    ///         r#"<table><thead><tr class="long-row">"#,
+    ///         r#"<table><caption></caption><thead><tr class="long-row">"#,
     ///         r#"<th>col1</th><td>col2</td><th id="third">col3</th>"#,
     ///         "</tr></thead><tbody></tbody></table>",
     ///     ),
@@ -555,7 +580,7 @@ impl Table {
     /// assert_eq!(
     ///     table.to_html_string(),
     ///     concat!(
-    ///         "<table><thead></thead><tbody>",
+    ///         "<table><caption></caption><thead></thead><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
     ///         "</tbody></table>"
     ///     )
@@ -585,7 +610,7 @@ impl Table {
     /// assert_eq!(
     ///     table,
     ///     concat!(
-    ///         "<table><thead></thead><tbody>",
+    ///         "<table><caption></caption><thead></thead><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
     ///         "</tbody></table>"
     ///     )
@@ -616,7 +641,7 @@ impl Table {
     /// assert_eq!(
     ///     table.to_html_string(),
     ///     concat!(
-    ///         "<table><thead></thead><tbody>",
+    ///         "<table><caption></caption><thead></thead><tbody>",
     ///         "<tr><td>col1</td><td>col2</td><td>col3</td></tr>",
     ///         "</tbody></table>",
     ///     ),
@@ -648,7 +673,7 @@ impl Table {
     /// assert_eq!(
     ///     table,
     ///     concat!(
-    ///         r#"<table><thead></thead><tbody><tr class="long-row">"#,
+    ///         r#"<table><caption></caption><thead></thead><tbody><tr class="long-row">"#,
     ///         r#"<td>col1</td><td>col2</td><td id="third">col3</td>"#,
     ///         "</tr></tbody></table>",
     ///     ),
@@ -677,7 +702,7 @@ mod tests {
         assert_eq!(
             result,
             concat!(
-                "<table><thead></thead><tbody>",
+                "<table><caption></caption><thead></thead><tbody>",
                 "<tr><td>1</td><td>2</td><td>3</td></tr>",
                 "<tr><td>4</td><td>5</td><td>6</td></tr>",
                 "<tr><td>7</td><td>8</td><td>9</td></tr>",
@@ -698,7 +723,7 @@ mod tests {
         assert_eq!(
             result,
             concat!(
-                "<table><thead></thead><tbody>",
+                "<table><caption></caption><thead></thead><tbody>",
                 "<tr><td>1</td><td>2</td><td>3</td></tr>",
                 "<tr><td>4</td><td>5</td><td>6</td></tr>",
                 "<tr><td>7</td><td>8</td><td>9</td></tr>",
@@ -728,6 +753,7 @@ mod tests {
         ]);
 
         let expected = "<table>
+                <caption></caption>
                 <thead></thead>
                 <tbody>
                     <tr>
@@ -737,6 +763,7 @@ mod tests {
                     <tr>
                         <td><div></div></td>
                         <td><div><table>
+                            <caption></caption>
                             <thead></thead>
                             <tbody>
                                 <tr>
