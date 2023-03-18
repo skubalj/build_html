@@ -230,6 +230,7 @@ impl TableRow {
 /// ```
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Table {
+    caption: Option<String>,
     thead: String,
     tbody: String,
     table_attr: Attributes,
@@ -242,11 +243,17 @@ impl Html for Table {
         format!(
             concat!(
                 "<table{table_attr}>",
+                "{caption}",
                 "<thead{thead_attr}>{thead}</thead>",
                 "<tbody{tbody_attr}>{tbody}</tbody>",
                 "</table>",
             ),
             table_attr = self.table_attr,
+            caption = self
+                .caption
+                .as_ref()
+                .map(|x| format!("<caption>{x}</caption>"))
+                .unwrap_or_default(),
             thead_attr = self.thead_attr,
             thead = self.thead,
             tbody_attr = self.tbody_attr,
@@ -321,6 +328,43 @@ impl Table {
         S: ToString,
     {
         self.add_attributes(attributes);
+        self
+    }
+
+    /// Set the caption for the table
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
+    /// let mut table = Table::new();
+    /// table.add_caption("Demo table");
+    /// assert_eq!(
+    ///     table.to_html_string(),
+    ///     "<table><caption>Demo table</caption><thead></thead><tbody></tbody></table>",
+    /// );
+    /// ```
+    pub fn add_caption<H: Html>(&mut self, caption: H) {
+        self.caption = Some(caption.to_html_string());
+    }
+
+    /// Set the caption for the table
+    ///
+    /// # Example
+    /// ```
+    /// # use build_html::*;
+    /// let table = Table::from([[1, 2],[3, 4]])
+    ///     .with_header_row(['a', 'b'])
+    ///     .with_caption("A demo table")
+    ///     .to_html_string();
+    /// assert_eq!(table, concat!(
+    ///     "<table><caption>A demo table</caption>",
+    ///     "<thead><tr><th>a</th><th>b</th></tr></thead>",
+    ///     "<tbody><tr><td>1</td><td>2</td></tr>",
+    ///     "<tr><td>3</td><td>4</td></tr></tbody></table>",
+    /// ));
+    /// ```
+    pub fn with_caption<H: Html>(mut self, caption: H) -> Self {
+        self.add_caption(caption);
         self
     }
 
