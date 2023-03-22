@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.4.0 (2023-03-21)
+* Add support for table `caption` tags, courtesy of Martin Miksanik (@milksax)
+
 ## Version 2.3.0 (2023-02-28)
 * Support for (X)HTML versions beyond HTML5, thanks to XORAPPS (@xorapps)
 * Support for attributes in `thead`, `tbody`, `tr`, `th`, and `td`.
