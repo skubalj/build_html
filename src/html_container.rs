@@ -1,10 +1,8 @@
 //! Defines the `HtmlContainer` Trait
 
-use crate::attributes::Attributes;
-use crate::content;
-use crate::Container;
-use crate::Html;
-use crate::Table;
+use std::iter::empty;
+
+use crate::{Container, Html, HtmlChild, HtmlElement, HtmlTag, Table};
 
 /// An HTML element that can contain other HTML elements
 ///
@@ -278,12 +276,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content.to_html_string(), r#"<div><h1>Header Text</h1></div>"#);
     /// ```
     fn add_header(&mut self, level: u8, text: impl ToString) {
-        let content = content::Header {
-            level,
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.add_html(content);
+        self.add_header_attr(level, text, empty::<(&str, &str)>());
     }
 
     /// Adds a header tag with the designated level to this container
@@ -298,12 +291,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><h1>Header Text</h1></div>"#);
     /// ```
     fn with_header(self, level: u8, text: impl ToString) -> Self {
-        let content = content::Header {
-            level,
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.with_html(content)
+        self.with_header_attr(level, text, empty::<(&str, &str)>())
     }
 
     /// Adds a header tag with the designated level and attributes to this container.
@@ -320,12 +308,22 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Header {
-            level,
-            content: text.to_string(),
-            attr: attr.into(),
+        let tag = match level {
+            1 => HtmlTag::Heading1,
+            2 => HtmlTag::Heading2,
+            3 => HtmlTag::Heading3,
+            4 => HtmlTag::Heading4,
+            5 => HtmlTag::Heading5,
+            6 => HtmlTag::Heading6,
+            _ => panic!("'{}' is not a valid html heading level", level),
         };
-        self.add_html(content);
+
+        let mut element = HtmlElement::new(tag).with_child(HtmlChild::Raw(text.to_string()));
+        for (k, v) in attr {
+            element.add_attribute(k, v)
+        }
+
+        self.add_html(element);
     }
 
     /// Adds a header tag with the designated level and attributes to this container.
@@ -339,17 +337,13 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><h1 id="main-header">Header Text</h1></div>"#);
     /// ```
-    fn with_header_attr<A, S>(self, level: u8, text: impl ToString, attr: A) -> Self
+    fn with_header_attr<A, S>(mut self, level: u8, text: impl ToString, attr: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Header {
-            level,
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.with_html(content)
+        self.add_header_attr(level, text, attr);
+        self
     }
 
     /// Adds an `<img>` tag to this container
@@ -361,16 +355,11 @@ pub trait HtmlContainer: Html + Sized {
     /// content.add_image("myimage.png", "a test image");
     /// assert_eq!(
     ///     content.to_html_string(),
-    ///     r#"<div><img src="myimage.png" alt="a test image"></div>"#
+    ///     r#"<div><img src="myimage.png" alt="a test image"/></div>"#
     /// );
     /// ```
     fn add_image(&mut self, src: impl ToString, alt: impl ToString) {
-        let content = content::Image {
-            src: src.to_string(),
-            alt: alt.to_string(),
-            attr: Attributes::default(),
-        };
-        self.add_html(content);
+        self.add_image_attr(src, alt, empty::<(&str, &str)>());
     }
 
     /// Adds an `<img>` tag to this container
@@ -382,15 +371,10 @@ pub trait HtmlContainer: Html + Sized {
     ///     .with_image("myimage.png", "a test image")
     ///     .to_html_string();
     ///
-    /// assert_eq!(content, r#"<div><img src="myimage.png" alt="a test image"></div>"#);
+    /// assert_eq!(content, r#"<div><img src="myimage.png" alt="a test image"/></div>"#);
     /// ```
     fn with_image(self, src: impl ToString, alt: impl ToString) -> Self {
-        let content = content::Image {
-            src: src.to_string(),
-            alt: alt.to_string(),
-            attr: Attributes::default(),
-        };
-        self.with_html(content)
+        self.with_image_attr(src, alt, empty::<(&str, &str)>())
     }
 
     /// Adds an `<img>` tag with the specified attributes to this container
@@ -406,7 +390,7 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(
     ///     content.to_html_string(),
-    ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"></div>"#
+    ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"/></div>"#
     /// );
     /// ```
     fn add_image_attr<A, S>(&mut self, src: impl ToString, alt: impl ToString, attr: A)
@@ -414,12 +398,14 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Image {
-            src: src.to_string(),
-            alt: alt.to_string(),
-            attr: attr.into(),
-        };
-        self.add_html(content);
+        let mut element = HtmlElement::new(HtmlTag::Image)
+            .with_attribute("src", src)
+            .with_attribute("alt", alt);
+        for (k, v) in attr {
+            element.add_attribute(k, v);
+        }
+
+        self.add_html(element);
     }
 
     /// Adds an `<img>` tag with the specified attributes to this container
@@ -436,20 +422,16 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(
     ///     content,
-    ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"></div>"#
+    ///     r#"<div><img src="myimage.png" alt="a test image" id="sample-image"/></div>"#
     /// );
     /// ```
-    fn with_image_attr<A, S>(self, src: impl ToString, alt: impl ToString, attr: A) -> Self
+    fn with_image_attr<A, S>(mut self, src: impl ToString, alt: impl ToString, attr: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Image {
-            src: src.to_string(),
-            alt: alt.to_string(),
-            attr: attr.into(),
-        };
-        self.with_html(content)
+        self.add_image_attr(src, alt, attr);
+        self
     }
 
     /// Adds an `<a>` tag to this container
@@ -466,12 +448,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_link(&mut self, href: impl ToString, text: impl ToString) {
-        let content = content::Link {
-            href: href.to_string(),
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.add_html(content)
+        self.add_link_attr(href, text, empty::<(&str, &str)>());
     }
 
     /// Adds an `<a>` tag to this container
@@ -486,12 +463,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><a href="https://rust-lang.org/">Rust Homepage</a></div>"#)
     /// ```
     fn with_link(self, href: impl ToString, text: impl ToString) -> Self {
-        let content = content::Link {
-            href: href.to_string(),
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.with_html(content)
+        self.with_link_attr(href, text, empty::<(&str, &str)>())
     }
 
     /// Adds an `<a>` tag with the specified attributes to this container
@@ -512,12 +484,13 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Link {
-            href: href.to_string(),
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.add_html(content);
+        let mut element = HtmlElement::new(HtmlTag::Link)
+            .with_attribute("href", href)
+            .with_child(HtmlChild::Raw(text.to_string()));
+        for (k, v) in attr {
+            element.add_attribute(k, v);
+        }
+        self.add_html(element);
     }
 
     /// Adds an `<a>` tag with the specified attributes to this container
@@ -534,17 +507,13 @@ pub trait HtmlContainer: Html + Sized {
     ///     r#"<div><a href="https://rust-lang.org/" class="links">Rust Homepage</a></div>"#
     /// )
     /// ```
-    fn with_link_attr<A, S>(self, href: impl ToString, text: impl ToString, attr: A) -> Self
+    fn with_link_attr<A, S>(mut self, href: impl ToString, text: impl ToString, attr: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Link {
-            href: href.to_string(),
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.with_html(content)
+        self.add_link_attr(href, text, attr);
+        self
     }
 
     /// Adds a `<p>` tag element to this Container
@@ -557,11 +526,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content.to_html_string(), r#"<div><p>This is sample paragraph text</p></div>"#);
     /// ```
     fn add_paragraph(&mut self, text: impl ToString) {
-        let content = content::Paragraph {
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.add_html(content)
+        self.add_paragraph_attr(text, empty::<(&str, &str)>());
     }
 
     /// Adds a `<p>` tag element to this Container
@@ -576,11 +541,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><p>This is sample paragraph text</p></div>"#);
     /// ```
     fn with_paragraph(self, text: impl ToString) -> Self {
-        let content = content::Paragraph {
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.with_html(content)
+        self.with_paragraph_attr(text, empty::<(&str, &str)>())
     }
 
     /// Adds a `<p>` tag element with the specified attributes to this Container
@@ -600,11 +561,12 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Paragraph {
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.add_html(content);
+        let mut element =
+            HtmlElement::new(HtmlTag::ParagraphText).with_child(HtmlChild::Raw(text.to_string()));
+        for (k, v) in attr {
+            element.add_attribute(k, v);
+        }
+        self.add_html(element);
     }
 
     /// Adds a `<p>` tag element with the specified attributes to this Container
@@ -618,16 +580,13 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><p class="text">This is sample paragraph text</p></div>"#)
     /// ```
-    fn with_paragraph_attr<A, S>(self, text: impl ToString, attr: A) -> Self
+    fn with_paragraph_attr<A, S>(mut self, text: impl ToString, attr: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Paragraph {
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.with_html(content)
+        self.add_paragraph_attr(text, attr);
+        self
     }
 
     /// Adds a `<pre>` tag element to this container
@@ -643,11 +602,7 @@ pub trait HtmlContainer: Html + Sized {
     /// );
     /// ```
     fn add_preformatted(&mut self, text: impl ToString) {
-        let content = content::Preformatted {
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.add_html(content);
+        self.add_preformatted_attr(text, empty::<(&str, &str)>());
     }
 
     /// Adds a `<pre>` tag element to this container
@@ -662,11 +617,7 @@ pub trait HtmlContainer: Html + Sized {
     /// assert_eq!(content, r#"<div><pre>This | is   preformatted => text</pre></div>"#);
     /// ```
     fn with_preformatted(self, text: impl ToString) -> Self {
-        let content = content::Preformatted {
-            content: text.to_string(),
-            attr: Attributes::default(),
-        };
-        self.with_html(content)
+        self.with_preformatted_attr(text, empty::<(&str, &str)>())
     }
 
     /// Adds a `<pre>` tag element with the specified attributes to this container
@@ -686,11 +637,12 @@ pub trait HtmlContainer: Html + Sized {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Preformatted {
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.add_html(content);
+        let mut element = HtmlElement::new(HtmlTag::PreformattedText)
+            .with_child(HtmlChild::Raw(text.to_string()));
+        for (k, v) in attr {
+            element.add_attribute(k, v);
+        }
+        self.add_html(element);
     }
 
     /// Adds a `<pre>` tag element with the specified attributes to this container
@@ -704,16 +656,13 @@ pub trait HtmlContainer: Html + Sized {
     ///
     /// assert_eq!(content, r#"<div><pre id="code">This | is   preformatted => text</pre></div>"#)
     /// ```
-    fn with_preformatted_attr<A, S>(self, text: impl ToString, attr: A) -> Self
+    fn with_preformatted_attr<A, S>(mut self, text: impl ToString, attr: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        let content = content::Preformatted {
-            content: text.to_string(),
-            attr: attr.into(),
-        };
-        self.with_html(content)
+        self.add_preformatted_attr(text, attr);
+        self
     }
 
     /// Add raw content to the container. This content is pasted directly into the HTML

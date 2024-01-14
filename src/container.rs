@@ -1,8 +1,6 @@
 //! This module contains information about containers and container types
 
-use crate::attributes::Attributes;
-use crate::html_container::HtmlContainer;
-use crate::Html;
+use crate::{Html, HtmlContainer, HtmlElement, HtmlTag};
 use std::fmt::{self, Display};
 
 /// The different types of HTML containers that can be added to the page
@@ -34,20 +32,26 @@ pub enum ContainerType {
     Section,
 }
 
+impl From<ContainerType> for HtmlTag {
+    fn from(value: ContainerType) -> Self {
+        match value {
+            ContainerType::Address => HtmlTag::Address,
+            ContainerType::Article => HtmlTag::Article,
+            ContainerType::Div => HtmlTag::Div,
+            ContainerType::Footer => HtmlTag::Footer,
+            ContainerType::Header => HtmlTag::Header,
+            ContainerType::Main => HtmlTag::Main,
+            ContainerType::OrderedList => HtmlTag::OrderedList,
+            ContainerType::UnorderedList => HtmlTag::UnorderedList,
+            ContainerType::Nav => HtmlTag::Navigation,
+            ContainerType::Section => HtmlTag::Section,
+        }
+    }
+}
+
 impl Display for ContainerType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Address => write!(f, "address"),
-            Self::Article => write!(f, "article"),
-            Self::Div => write!(f, "div"),
-            Self::Footer => write!(f, "footer"),
-            Self::Header => write!(f, "header"),
-            Self::Main => write!(f, "main"),
-            Self::OrderedList => write!(f, "ol"),
-            Self::UnorderedList => write!(f, "ul"),
-            Self::Nav => write!(f, "nav"),
-            Self::Section => write!(f, "section"),
-        }
+        HtmlTag::from(*self).fmt(f)
     }
 }
 
@@ -78,34 +82,30 @@ impl Display for ContainerType {
 ///     "<main><h1>My Container</h1><article><div><p>Inner Text</p></div></article></main>"
 /// );
 /// ```
-#[derive(Debug, Default)]
-pub struct Container {
-    tag: ContainerType,
-    elements: String,
-    attr: Attributes,
+#[derive(Debug)]
+pub struct Container(HtmlElement);
+
+impl Default for Container {
+    fn default() -> Self {
+        Self::new(Default::default())
+    }
 }
 
 impl Html for Container {
     fn to_html_string(&self) -> String {
-        format!(
-            "<{tag}{attr}>{content}</{tag}>",
-            tag = self.tag,
-            attr = self.attr,
-            content = self.elements,
-        )
+        self.0.to_html_string()
     }
 }
 
 impl HtmlContainer for Container {
-    #[inline]
     fn add_html<H: Html>(&mut self, content: H) {
-        match self.tag {
-            ContainerType::OrderedList | ContainerType::UnorderedList => {
-                self.elements.push_str("<li>");
-                self.elements.push_str(content.to_html_string().as_str());
-                self.elements.push_str("</li>");
-            }
-            _ => self.elements.push_str(content.to_html_string().as_str()),
+        match self.0.tag {
+            HtmlTag::OrderedList | HtmlTag::UnorderedList => self.0.add_child(
+                HtmlElement::new(HtmlTag::ListElement)
+                    .with_html(content)
+                    .into(),
+            ),
+            _ => self.0.add_html(content),
         };
     }
 }
@@ -113,11 +113,7 @@ impl HtmlContainer for Container {
 impl Container {
     /// Creates a new container with the specified tag.
     pub fn new(tag: ContainerType) -> Self {
-        Container {
-            tag,
-            elements: String::new(),
-            attr: Attributes::default(),
-        }
+        Self(HtmlElement::new(tag.into()))
     }
 
     /// Associates the specified map of attributes with this Container.
@@ -140,7 +136,9 @@ impl Container {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.attr = Attributes::from(attributes);
+        for (k, v) in attributes {
+            self.0.add_attribute(k, v);
+        }
         self
     }
 }
@@ -157,7 +155,7 @@ mod tests {
         // Expected
         let content = concat!(
             r#"<h1 id="main-header">header</h1>"#,
-            r#"<img src="myimage.png" alt="test image">"#,
+            r#"<img src="myimage.png" alt="test image"/>"#,
             r#"<a href="rust-lang.org">Rust Home</a>"#,
             r#"<p class="red-text">Sample Text</p>"#,
             r#"<pre class="code">Text</pre>"#
@@ -188,7 +186,7 @@ mod tests {
         // Expected
         let content = concat!(
             r#"<li><h1 id="main-header">header</h1></li>"#,
-            r#"<li><img src="myimage.png" alt="test image"></li>"#,
+            r#"<li><img src="myimage.png" alt="test image"/></li>"#,
             r#"<li><a href="rust-lang.org">Rust Home</a></li>"#,
             r#"<li><p class="red-text">Sample Text</p></li>"#,
             r#"<li><pre class="code">Text</pre></li>"#

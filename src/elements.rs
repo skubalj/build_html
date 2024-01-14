@@ -1,13 +1,13 @@
 //! Definitions for generic HTML tags
 
-use std::fmt::{self, Display, Formatter};
 use crate::{Html, HtmlContainer};
+use std::fmt::{self, Display, Formatter};
 
 /// A list of HTML tags
 ///
 /// This non-comprehensive list of tags is a subset of those listed in the MDN Web Docs
 /// [Html Elements Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element).
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum HtmlTag {
     /// A contact address
     Address,
@@ -169,7 +169,7 @@ impl HtmlTag {
 ///
 /// Generally, `HtmlContent` shouldn't need to be used directly. You can use `.into()` to convert
 /// strings and [`HtmlElement`]s into this type seamlessly.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum HtmlChild {
     /// An element that can have more children of its own
     Element(HtmlElement),
@@ -230,10 +230,10 @@ impl<S: AsRef<str>> From<S> for HtmlChild {
 ///
 /// assert_eq!(output, r#"<div><h1 class="big-text">Header Text</h1><p>Paragraph Text<br/>Paragraph Text Line 2</p></div>"#);
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HtmlElement {
     /// The tag to be used for this element
-    tag: HtmlTag,
+    pub tag: HtmlTag,
     /// A list of the attributes that will be printed in this element in the form `(key, value)`
     pub attributes: Vec<(String, String)>,
     /// A list of the child elements contained within this element
@@ -312,9 +312,9 @@ impl HtmlElement {
     /// ```
     /// # use build_html::*;
     /// let output = HtmlElement::new(HtmlTag::ParagraphText)
-    ///     .add_child("First Line".into())
-    ///     .add_child(HtmlElement::new(HtmlTag::LineBreak).into())
-    ///     .add_child("Second Line".into())
+    ///     .with_child("First Line".into())
+    ///     .with_child(HtmlElement::new(HtmlTag::LineBreak).into())
+    ///     .with_child("Second Line".into())
     ///     .to_html_string();
     /// assert_eq!(output, "<p>First Line<br/>Second Line</p>");
     /// ```
@@ -346,9 +346,10 @@ impl HtmlElement {
     /// ```
     /// # use build_html::*;
     /// let output = HtmlElement::new(HtmlTag::Div)
-    ///     .add_attribute("class", "container")
+    ///     .with_attribute("class", "container")
+    ///     .with_attribute("id", "first-div")
     ///     .to_html_string();
-    /// assert_eq!(output, r#"<div class="container"/>"#);
+    /// assert_eq!(output, r#"<div class="container" id="first-div"/>"#);
     /// ```
     pub fn with_attribute(mut self, k: impl ToString, v: impl ToString) -> Self {
         self.add_attribute(k, v);

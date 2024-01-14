@@ -3,12 +3,11 @@
 //! Tables are provided using the `Table` struct, and are loaded from 1 and 2D data
 //! structures which implement the `IntoIterator` struct
 
-use crate::Html;
-use crate::{attributes::Attributes, HtmlContainer};
+use crate::{Html, HtmlChild, HtmlContainer, HtmlElement, HtmlTag};
 use std::fmt::{self, Display, Formatter};
 
 /// The different types of table cells
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub enum TableCellType {
     /// Data elements using `<td>` tags
     #[default]
@@ -17,12 +16,18 @@ pub enum TableCellType {
     Header,
 }
 
+impl From<TableCellType> for HtmlTag {
+    fn from(value: TableCellType) -> Self {
+        match value {
+            TableCellType::Data => HtmlTag::TableCell,
+            TableCellType::Header => HtmlTag::TableHeaderCell,
+        }
+    }
+}
+
 impl Display for TableCellType {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Data => write!(f, "td"),
-            Self::Header => write!(f, "th"),
-        }
+        HtmlTag::from(*self).fmt(f)
     }
 }
 
@@ -41,38 +46,31 @@ impl Display for TableCellType {
 ///
 /// assert_eq!(cell, r#"<th id="header-cell" class="headers"><p>Here's a paragraph!</p></th>"#);
 /// ```
-#[derive(Debug, Default)]
-pub struct TableCell {
-    cell_type: TableCellType,
-    attr: Attributes,
-    content: String,
+#[derive(Debug)]
+pub struct TableCell(HtmlElement);
+
+impl Default for TableCell {
+    fn default() -> Self {
+        Self::new(Default::default())
+    }
 }
 
 impl Html for TableCell {
     fn to_html_string(&self) -> String {
-        format!(
-            "<{tag}{attr}>{content}</{tag}>",
-            tag = self.cell_type,
-            attr = self.attr,
-            content = self.content.to_html_string()
-        )
+        self.0.to_html_string()
     }
 }
 
 impl HtmlContainer for TableCell {
     fn add_html<H: Html>(&mut self, html: H) {
-        self.content.push_str(&html.to_html_string());
+        self.0.add_child(HtmlChild::Raw(html.to_html_string()));
     }
 }
 
 impl TableCell {
     /// Create a new TableCell with the given type
     pub fn new(cell_type: TableCellType) -> Self {
-        Self {
-            cell_type,
-            attr: Attributes::default(),
-            content: String::new(),
-        }
+        Self(HtmlElement::new(cell_type.into()))
     }
 
     /// Set the attributes for this row.
@@ -93,7 +91,9 @@ impl TableCell {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.attr = Attributes::from(attributes);
+        for (k, v) in attributes {
+            self.0.add_attribute(k, v);
+        }
         self
     }
 }
@@ -111,15 +111,18 @@ impl TableCell {
 ///
 /// assert_eq!(row, r#"<tr id="my-row"><th>Header</th><td>1</td></tr>"#);
 /// ```
-#[derive(Debug, Default)]
-pub struct TableRow {
-    attr: Attributes,
-    content: String,
+#[derive(Debug)]
+pub struct TableRow(HtmlElement);
+
+impl Default for TableRow {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Html for TableRow {
     fn to_html_string(&self) -> String {
-        format!("<tr{}>{}</tr>", self.attr, self.content)
+        self.0.to_html_string()
     }
 }
 
@@ -138,7 +141,7 @@ where
 impl TableRow {
     /// Create a new, empty TableRow
     pub fn new() -> Self {
-        Self::default()
+        Self(HtmlElement::new(HtmlTag::TableRow))
     }
 
     /// Set the attributes for this row.
@@ -152,14 +155,16 @@ impl TableRow {
     ///     .with_attributes([("id", "first-row"), ("class", "table-rows")])
     ///     .with_cell(TableCell::default())
     ///     .to_html_string();
-    /// assert_eq!(out, r#"<tr id="first-row" class="table-rows"><td></td></tr>"#);
+    /// assert_eq!(out, r#"<tr id="first-row" class="table-rows"><td/></tr>"#);
     /// ```
     pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.attr = Attributes::from(attributes);
+        for (k, v) in attributes {
+            self.0.add_attribute(k, v);
+        }
         self
     }
 
@@ -173,7 +178,7 @@ impl TableRow {
     /// assert_eq!(out.to_html_string(), "<tr><td><p>Hello, World!</p></td></tr>");
     /// ```
     pub fn add_cell(&mut self, cell: TableCell) {
-        self.content.push_str(&cell.to_html_string());
+        self.0.add_child(cell.0.into())
     }
 
     /// Nest the given cell inside this row
@@ -228,37 +233,30 @@ impl TableRow {
 ///     )
 /// );
 /// ```
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct Table {
-    caption: Option<String>,
-    thead: String,
-    tbody: String,
-    table_attr: Attributes,
-    thead_attr: Attributes,
-    tbody_attr: Attributes,
+    table: HtmlElement,
+    thead: HtmlElement,
+    tbody: HtmlElement,
+    caption: Option<HtmlElement>,
+}
+
+impl Default for Table {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Html for Table {
     fn to_html_string(&self) -> String {
-        format!(
-            concat!(
-                "<table{table_attr}>",
-                "{caption}",
-                "<thead{thead_attr}>{thead}</thead>",
-                "<tbody{tbody_attr}>{tbody}</tbody>",
-                "</table>",
-            ),
-            table_attr = self.table_attr,
-            caption = self
-                .caption
-                .as_ref()
-                .map(|x| format!("<caption>{x}</caption>"))
-                .unwrap_or_default(),
-            thead_attr = self.thead_attr,
-            thead = self.thead,
-            tbody_attr = self.tbody_attr,
-            tbody = self.tbody,
-        )
+        let mut table = self.table.clone();
+        if let Some(caption) = self.caption.as_ref() {
+            table.add_child(caption.clone().into());
+        }
+        table
+            .with_child(self.thead.clone().into())
+            .with_child(self.tbody.clone().into())
+            .to_html_string()
     }
 }
 
@@ -278,7 +276,12 @@ where
 impl Table {
     /// Creates a new table with an empty header and body
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            table: HtmlElement::new(HtmlTag::Table),
+            thead: HtmlElement::new(HtmlTag::TableHeader),
+            tbody: HtmlElement::new(HtmlTag::TableBody),
+            caption: None,
+        }
     }
 
     /// Associates the specified map of attributes with this `Table`.
@@ -294,7 +297,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     r#"<table id="my-table"><thead></thead><tbody></tbody></table>"#
+    ///     r#"<table id="my-table"><thead/><tbody/></table>"#
     /// );
     /// ```
     pub fn add_attributes<A, S>(&mut self, attributes: A)
@@ -302,7 +305,9 @@ impl Table {
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.table_attr = Attributes::from(attributes);
+        for (k, v) in attributes {
+            self.table.add_attribute(k, v);
+        }
     }
 
     /// Associates the specified map of attributes with this `Table`.
@@ -317,10 +322,7 @@ impl Table {
     ///     .with_attributes([("id", "my-table")])
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     table,
-    ///     r#"<table id="my-table"><thead></thead><tbody></tbody></table>"#
-    /// );
+    /// assert_eq!(table, r#"<table id="my-table"><thead/><tbody/></table>"#);
     /// ```
     pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -340,11 +342,11 @@ impl Table {
     /// table.add_caption("Demo table");
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     "<table><caption>Demo table</caption><thead></thead><tbody></tbody></table>",
+    ///     "<table><caption>Demo table</caption><thead/><tbody/></table>",
     /// );
     /// ```
     pub fn add_caption<H: Html>(&mut self, caption: H) {
-        self.caption = Some(caption.to_html_string());
+        self.caption = Some(HtmlElement::new(HtmlTag::TableCaption).with_html(caption));
     }
 
     /// Set the caption for the table
@@ -379,17 +381,16 @@ impl Table {
     /// let mut table = Table::new();
     /// table.add_thead_attributes([("id", "table-header")]);
     ///
-    /// assert_eq!(
-    ///     table.to_html_string(),
-    ///     r#"<table><thead id="table-header"></thead><tbody></tbody></table>"#
-    /// );
+    /// assert_eq!(table.to_html_string(), r#"<table><thead id="table-header"/><tbody/></table>"#);
     /// ```
     pub fn add_thead_attributes<A, S>(&mut self, attributes: A)
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.thead_attr = Attributes::from(attributes);
+        for (k, v) in attributes {
+            self.thead.add_attribute(k, v);
+        }
     }
 
     /// Associates the specified map of attributes with the `thead` of this `Table`.
@@ -405,10 +406,7 @@ impl Table {
     ///     .with_thead_attributes([("id", "my-thead")])
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     table,
-    ///     r#"<table id="my-table"><thead id="my-thead"></thead><tbody></tbody></table>"#
-    /// );
+    /// assert_eq!(table, r#"<table id="my-table"><thead id="my-thead"/><tbody/></table>"#);
     /// ```
     pub fn with_thead_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -430,17 +428,16 @@ impl Table {
     /// let mut table = Table::new();
     /// table.add_tbody_attributes([("id", "table-body")]);
     ///
-    /// assert_eq!(
-    ///     table.to_html_string(),
-    ///     r#"<table><thead></thead><tbody id="table-body"></tbody></table>"#
-    /// );
+    /// assert_eq!(table.to_html_string(), r#"<table><thead/><tbody id="table-body"/></table>"#);
     /// ```
     pub fn add_tbody_attributes<A, S>(&mut self, attributes: A)
     where
         A: IntoIterator<Item = (S, S)>,
         S: ToString,
     {
-        self.tbody_attr = Attributes::from(attributes);
+        for (k, v) in attributes {
+            self.tbody.add_attribute(k, v);
+        }
     }
 
     /// Associates the specified map of attributes with the `tbody` of this `Table`.
@@ -456,10 +453,7 @@ impl Table {
     ///     .with_tbody_attributes([("id", "my-body")])
     ///     .to_html_string();
     ///
-    /// assert_eq!(
-    ///     table,
-    ///     r#"<table id="my-table"><thead></thead><tbody id="my-body"></tbody></table>"#
-    /// );
+    /// assert_eq!(table, r#"<table id="my-table"><thead/><tbody id="my-body"/></table>"#);
     /// ```
     pub fn with_tbody_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -484,7 +478,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
-    ///         "</thead><tbody></tbody></table>"
+    ///         "</thead><tbody/></table>"
     ///     )
     /// )
     /// ```
@@ -514,7 +508,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
-    ///         "</thead><tbody></tbody></table>"
+    ///         "</thead><tbody/></table>"
     ///     )
     /// )
     /// ```
@@ -545,12 +539,12 @@ impl Table {
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>col1</th><th>col2</th><th>col3</th></tr>",
-    ///         "</thead><tbody></tbody></table>",
+    ///         "</thead><tbody/></table>",
     ///     ),
     /// );
     /// ```
     pub fn add_custom_header_row(&mut self, row: TableRow) {
-        self.thead.push_str(&row.to_html_string());
+        self.thead.add_child(row.0.into());
     }
 
     /// Add the specified row to the table header
@@ -577,7 +571,7 @@ impl Table {
     ///     concat!(
     ///         r#"<table><thead><tr class="long-row">"#,
     ///         r#"<th>col1</th><td>col2</td><th id="third">col3</th>"#,
-    ///         "</tr></thead><tbody></tbody></table>",
+    ///         "</tr></thead><tbody/></table>",
     ///     ),
     /// );
     /// ```
@@ -599,7 +593,7 @@ impl Table {
     /// assert_eq!(
     ///     table.to_html_string(),
     ///     concat!(
-    ///         "<table><thead></thead><tbody>",
+    ///         "<table><thead/><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
     ///         "</tbody></table>"
     ///     )
@@ -611,7 +605,7 @@ impl Table {
         T::Item: Display,
     {
         self.add_custom_body_row(row.into_iter().fold(TableRow::new(), |a, n| {
-            a.with_cell(TableCell::new(TableCellType::Data).with_raw(n))
+            a.with_cell(TableCell::default().with_raw(n))
         }))
     }
 
@@ -629,7 +623,7 @@ impl Table {
     /// assert_eq!(
     ///     table,
     ///     concat!(
-    ///         "<table><thead></thead><tbody>",
+    ///         "<table><thead/><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
     ///         "</tbody></table>"
     ///     )
@@ -660,14 +654,14 @@ impl Table {
     /// assert_eq!(
     ///     table.to_html_string(),
     ///     concat!(
-    ///         "<table><thead></thead><tbody>",
+    ///         "<table><thead/><tbody>",
     ///         "<tr><td>col1</td><td>col2</td><td>col3</td></tr>",
     ///         "</tbody></table>",
     ///     ),
     /// );
     /// ```
     pub fn add_custom_body_row(&mut self, row: TableRow) {
-        self.tbody.push_str(&row.to_html_string());
+        self.tbody.add_child(row.0.into());
     }
 
     /// Add the specified row to the table body
@@ -692,7 +686,7 @@ impl Table {
     /// assert_eq!(
     ///     table,
     ///     concat!(
-    ///         r#"<table><thead></thead><tbody><tr class="long-row">"#,
+    ///         r#"<table><thead/><tbody><tr class="long-row">"#,
     ///         r#"<td>col1</td><td>col2</td><td id="third">col3</td>"#,
     ///         "</tr></tbody></table>",
     ///     ),
@@ -721,7 +715,7 @@ mod tests {
         assert_eq!(
             result,
             concat!(
-                "<table><thead></thead><tbody>",
+                "<table><thead/><tbody>",
                 "<tr><td>1</td><td>2</td><td>3</td></tr>",
                 "<tr><td>4</td><td>5</td><td>6</td></tr>",
                 "<tr><td>7</td><td>8</td><td>9</td></tr>",
@@ -742,7 +736,7 @@ mod tests {
         assert_eq!(
             result,
             concat!(
-                "<table><thead></thead><tbody>",
+                "<table><thead/><tbody>",
                 "<tr><td>1</td><td>2</td><td>3</td></tr>",
                 "<tr><td>4</td><td>5</td><td>6</td></tr>",
                 "<tr><td>7</td><td>8</td><td>9</td></tr>",
@@ -772,16 +766,16 @@ mod tests {
         ]);
 
         let expected = "<table>
-                <thead></thead>
+                <thead/>
                 <tbody>
                     <tr>
                         <td><div><p>This_is_column_one</p></div></td>
                         <td><article><p>This_is_column_two</p></article></td>
                     </tr>
                     <tr>
-                        <td><div></div></td>
+                        <td><div/></td>
                         <td><div><table>
-                            <thead></thead>
+                            <thead/>
                             <tbody>
                                 <tr>
                                     <td>1</td>

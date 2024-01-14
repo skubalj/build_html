@@ -70,7 +70,6 @@
 
 mod attributes;
 mod container;
-mod content;
 mod html_container;
 mod html_page;
 mod table;
