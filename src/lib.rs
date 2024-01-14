@@ -74,12 +74,14 @@ mod content;
 mod html_container;
 mod html_page;
 mod table;
+mod elements;
 
 // Exports for the `use build_html::*` syntax
 pub use self::container::{Container, ContainerType};
 pub use self::html_container::HtmlContainer;
 pub use self::html_page::{HtmlPage, HtmlVersion};
 pub use self::table::{Table, TableCell, TableCellType, TableRow};
+pub use self::elements::{HtmlChild, HtmlElement, HtmlTag};
 
 /// An element that can be converted to an HTML string
 ///
