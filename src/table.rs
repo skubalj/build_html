@@ -250,10 +250,17 @@ impl Default for Table {
 
 impl Html for Table {
     fn to_html_string(&self) -> String {
-        let mut table = self.table.clone()
-                                            .with_child(self.thead.clone().into())
-                                            .with_child(self.tbody.clone().into())
-                                            .with_child(self.tfoot.clone().into());
+        let mut table = self
+            .table
+            .clone()
+            .with_child(self.thead.clone().into())
+            .with_child(self.tbody.clone().into());
+
+        // To keep the output the same between versions, only add a footer if there's data in it.
+        // This can be made imperative at the next major version.
+        if !self.tfoot.children.is_empty() || !self.tfoot.attributes.is_empty() {
+            table.add_child(self.tfoot.clone().into());
+        }
 
         if let Some(caption) = self.caption.as_ref() {
             table.add_child(caption.clone().into());
@@ -301,7 +308,7 @@ impl Table {
     ///
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     r#"<table id="my-table"><thead/><tbody/><tfoot/></table>"#
+    ///     r#"<table id="my-table"><thead/><tbody/></table>"#
     /// );
     /// ```
     pub fn add_attributes<A, S>(&mut self, attributes: A)
@@ -326,7 +333,7 @@ impl Table {
     ///     .with_attributes([("id", "my-table")])
     ///     .to_html_string();
     ///
-    /// assert_eq!(table, r#"<table id="my-table"><thead/><tbody/><tfoot/></table>"#);
+    /// assert_eq!(table, r#"<table id="my-table"><thead/><tbody/></table>"#);
     /// ```
     pub fn with_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -346,7 +353,7 @@ impl Table {
     /// table.add_caption("Demo table");
     /// assert_eq!(
     ///     table.to_html_string(),
-    ///     "<table><thead/><tbody/><tfoot/><caption>Demo table</caption></table>",
+    ///     "<table><thead/><tbody/><caption>Demo table</caption></table>",
     /// );
     /// ```
     pub fn add_caption<H: Html>(&mut self, caption: H) {
@@ -366,7 +373,7 @@ impl Table {
     ///     "<table>",
     ///     "<thead><tr><th>a</th><th>b</th></tr></thead>",
     ///     "<tbody><tr><td>1</td><td>2</td></tr>",
-    ///     "<tr><td>3</td><td>4</td></tr></tbody><tfoot/>",
+    ///     "<tr><td>3</td><td>4</td></tr></tbody>",
     ///     "<caption>A demo table</caption></table>"
     /// ));
     /// ```
@@ -386,7 +393,7 @@ impl Table {
     /// let mut table = Table::new();
     /// table.add_thead_attributes([("id", "table-header")]);
     ///
-    /// assert_eq!(table.to_html_string(), r#"<table><thead id="table-header"/><tbody/><tfoot/></table>"#);
+    /// assert_eq!(table.to_html_string(), r#"<table><thead id="table-header"/><tbody/></table>"#);
     /// ```
     pub fn add_thead_attributes<A, S>(&mut self, attributes: A)
     where
@@ -411,7 +418,7 @@ impl Table {
     ///     .with_thead_attributes([("id", "my-thead")])
     ///     .to_html_string();
     ///
-    /// assert_eq!(table, r#"<table id="my-table"><thead id="my-thead"/><tbody/><tfoot/></table>"#);
+    /// assert_eq!(table, r#"<table id="my-table"><thead id="my-thead"/><tbody/></table>"#);
     /// ```
     pub fn with_thead_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -433,7 +440,7 @@ impl Table {
     /// let mut table = Table::new();
     /// table.add_tbody_attributes([("id", "table-body")]);
     ///
-    /// assert_eq!(table.to_html_string(), r#"<table><thead/><tbody id="table-body"/><tfoot/></table>"#);
+    /// assert_eq!(table.to_html_string(), r#"<table><thead/><tbody id="table-body"/></table>"#);
     /// ```
     pub fn add_tbody_attributes<A, S>(&mut self, attributes: A)
     where
@@ -458,7 +465,7 @@ impl Table {
     ///     .with_tbody_attributes([("id", "my-body")])
     ///     .to_html_string();
     ///
-    /// assert_eq!(table, r#"<table id="my-table"><thead/><tbody id="my-body"/><tfoot/></table>"#);
+    /// assert_eq!(table, r#"<table id="my-table"><thead/><tbody id="my-body"/></table>"#);
     /// ```
     pub fn with_tbody_attributes<A, S>(mut self, attributes: A) -> Self
     where
@@ -530,7 +537,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
-    ///         "</thead><tbody/><tfoot/></table>"
+    ///         "</thead><tbody/></table>"
     ///     )
     /// )
     /// ```
@@ -560,7 +567,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>Mon</th><th>Tues</th><th>Wed</th><th>Thurs</th><th>Fri</th></tr>",
-    ///         "</thead><tbody/><tfoot/></table>"
+    ///         "</thead><tbody/></table>"
     ///     )
     /// )
     /// ```
@@ -591,7 +598,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead>",
     ///         "<tr><th>col1</th><th>col2</th><th>col3</th></tr>",
-    ///         "</thead><tbody/><tfoot/></table>",
+    ///         "</thead><tbody/></table>",
     ///     ),
     /// );
     /// ```
@@ -623,7 +630,7 @@ impl Table {
     ///     concat!(
     ///         r#"<table><thead><tr class="long-row">"#,
     ///         r#"<th>col1</th><td>col2</td><th id="third">col3</th>"#,
-    ///         "</tr></thead><tbody/><tfoot/></table>",
+    ///         "</tr></thead><tbody/></table>",
     ///     ),
     /// );
     /// ```
@@ -647,7 +654,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead/><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
-    ///         "</tbody><tfoot/></table>"
+    ///         "</tbody></table>"
     ///     )
     /// )
     /// ```
@@ -677,7 +684,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead/><tbody>",
     ///         "<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>",
-    ///         "</tbody><tfoot/></table>"
+    ///         "</tbody></table>"
     ///     )
     /// )
     /// ```
@@ -708,7 +715,7 @@ impl Table {
     ///     concat!(
     ///         "<table><thead/><tbody>",
     ///         "<tr><td>col1</td><td>col2</td><td>col3</td></tr>",
-    ///         "</tbody><tfoot/></table>",
+    ///         "</tbody></table>",
     ///     ),
     /// );
     /// ```
@@ -740,7 +747,7 @@ impl Table {
     ///     concat!(
     ///         r#"<table><thead/><tbody><tr class="long-row">"#,
     ///         r#"<td>col1</td><td>col2</td><td id="third">col3</td>"#,
-    ///         "</tr></tbody><tfoot/></table>",
+    ///         "</tr></tbody></table>",
     ///     ),
     /// );
     /// ```
@@ -888,7 +895,7 @@ mod tests {
                 "<tr><td>1</td><td>2</td><td>3</td></tr>",
                 "<tr><td>4</td><td>5</td><td>6</td></tr>",
                 "<tr><td>7</td><td>8</td><td>9</td></tr>",
-                "</tbody><tfoot/></table>"
+                "</tbody></table>"
             )
         )
     }
@@ -909,7 +916,7 @@ mod tests {
                 "<tr><td>1</td><td>2</td><td>3</td></tr>",
                 "<tr><td>4</td><td>5</td><td>6</td></tr>",
                 "<tr><td>7</td><td>8</td><td>9</td></tr>",
-                "</tbody><tfoot/></table>"
+                "</tbody></table>"
             )
         )
     }
@@ -955,11 +962,9 @@ mod tests {
                                     <td>4</td>
                                 </tr>
                             </tbody>
-                            <tfoot/>
                         </table></div></td>
                     </tr>
                 </tbody>
-                <tfoot/>
             </table>";
 
         assert_eq!(
