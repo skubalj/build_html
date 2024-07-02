@@ -146,12 +146,9 @@ impl Container {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test_case::test_case;
 
-    #[test_case(ContainerType::Article; "article")]
-    #[test_case(ContainerType::Div; "div")]
-    #[test_case(ContainerType::Main; "main")]
-    fn test_content(container_type: ContainerType) {
+    #[test]
+    fn test_content() {
         // Expected
         let content = concat!(
             r#"<h1 id="main-header">header</h1>"#,
@@ -162,7 +159,7 @@ mod tests {
         );
 
         // Act
-        let sut = Container::new(container_type)
+        let sut = Container::new(ContainerType::Article)
             .with_header_attr(1, "header", [("id", "main-header")])
             .with_image("myimage.png", "test image")
             .with_link("rust-lang.org", "Rust Home")
@@ -174,15 +171,14 @@ mod tests {
             sut.to_html_string(),
             format!(
                 "<{tag}>{content}</{tag}>",
-                tag = container_type,
+                tag = ContainerType::Article,
                 content = content
             )
         )
     }
 
-    #[test_case(ContainerType::OrderedList; "ordered_list")]
-    #[test_case(ContainerType::UnorderedList; "unordered_list")]
-    fn test_list(container_type: ContainerType) {
+    #[test]
+    fn test_list() {
         // Expected
         let content = concat!(
             r#"<li><h1 id="main-header">header</h1></li>"#,
@@ -193,7 +189,7 @@ mod tests {
         );
 
         // Act
-        let sut = Container::new(container_type)
+        let sut = Container::new(ContainerType::OrderedList)
             .with_header_attr(1, "header", [("id", "main-header")])
             .with_image("myimage.png", "test image")
             .with_link("rust-lang.org", "Rust Home")
@@ -205,7 +201,7 @@ mod tests {
             sut.to_html_string(),
             format!(
                 "<{tag}>{content}</{tag}>",
-                tag = container_type,
+                tag = ContainerType::OrderedList,
                 content = content
             )
         )

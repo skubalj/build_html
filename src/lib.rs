@@ -69,13 +69,12 @@
 //!
 //! ```
 //! # use build_html::{HtmlElement, HtmlTag, Html, HtmlContainer};
-//!
 //! let mut root = HtmlElement::new(HtmlTag::Div)
 //!     .with_child(HtmlElement::new(HtmlTag::Heading1).with_child("Counts".into()).into());
 //!
 //! for x in 1..=3 {
-//!     // Here, we're adding by reference using an `add` function while also building
-//!     // our inner element with a `with` function.
+//!     // Here, we're adding by reference using an `add` method while also building
+//!     // our inner element with a `with` method.
 //!     root.add_child(HtmlElement::new(HtmlTag::Div).with_paragraph(x).into());
 //! }
 //!
