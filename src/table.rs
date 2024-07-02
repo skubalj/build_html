@@ -877,7 +877,7 @@ impl Table {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Container, ContainerType, Html, HtmlContainer};
+    use crate::{Html, HtmlContainer, HtmlElement, HtmlTag};
 
     #[test]
     fn test_from_arr() {
@@ -926,16 +926,16 @@ mod tests {
         // Arrange
         let table = Table::from([
             [
-                Container::default()
+                HtmlElement::new(HtmlTag::Div)
                     .with_paragraph("This_is_column_one")
                     .to_html_string(),
-                Container::new(ContainerType::Article)
+                HtmlElement::new(HtmlTag::Article)
                     .with_paragraph("This_is_column_two")
                     .to_html_string(),
             ],
             [
-                Container::default().to_html_string(),
-                Container::default()
+                HtmlElement::new(HtmlTag::Div).to_html_string(),
+                HtmlElement::new(HtmlTag::Div)
                     .with_table(Table::from([[1, 2], [3, 4]]))
                     .to_html_string(),
             ],

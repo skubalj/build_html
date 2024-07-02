@@ -5,6 +5,7 @@ use std::fmt::{self, Display, Formatter};
 /// This non-comprehensive list of tags is a subset of those listed in the MDN Web Docs
 /// [Html Elements Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element).
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[non_exhaustive]
 pub enum HtmlTag {
     /// A contact address
     Address,
@@ -73,7 +74,7 @@ pub enum HtmlTag {
     Main,
     /// A container for the navigation contenton a page
     Navigation,
-    /// An unordered list, generally a bulleted list
+    /// An unordered, generally numbered, list
     OrderedList,
     /// Paragraph text
     ParagraphText,
@@ -101,7 +102,7 @@ pub enum HtmlTag {
     TableHeaderCell,
     /// A table row
     TableRow,
-    /// An unordered list, generally numbered
+    /// An unordered, generally bulleted, list
     UnorderedList,
     /// An embedded video element
     Video,

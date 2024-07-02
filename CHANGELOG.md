@@ -1,11 +1,12 @@
 Changelog
 =========
 
-## Version 2.5.0 (TBD)
-* Added `HtmlElement`, `HtmlTag`, and `HtmlChild` elements. (v3 interface)
-    * Shift underlying implementation to v3 core, but retain compatibility with v2.
+## Version 2.5.0 (2024-07-01)
+* Added `HtmlElement`, `HtmlTag`, and `HtmlChild` elements.
+    * Shift underlying implementation to use these types, but retain compatibility with v2.
     * This gives the flexibility for people to arbitrarily add attributes and child elements.
 * Added support for table `tfoot` tags, courtesy of Nicola Ricciardi (@nricciardi)
+* Updated documentation
 
 ## Version 2.4.0 (2023-03-21)
 * Add support for table `caption` tags, courtesy of Martin Miksanik (@milksax)

@@ -7,14 +7,13 @@ use crate::{Container, Html, HtmlChild, HtmlElement, HtmlTag, Table};
 /// An HTML element that can contain other HTML elements
 ///
 /// The methods on this trait are implemented generically, allowing any type (or combination of
-/// types) implementing [`ToString`] to be passed in. Thanks to monomorphization, this can happen
-/// without incurring any runtime cost. For example, we can pass an `Ipv4Addr` object into
-/// `with_paragraph` directly:
+/// types) implementing [`ToString`] to be passed in. For example, we can pass an `Ipv4Addr` object
+/// into `with_paragraph` directly:
 ///
 /// ```
 /// # use build_html::*;
 /// # use std::net::Ipv4Addr;
-/// let content = Container::default()
+/// let content = HtmlElement::new(HtmlTag::Div)
 ///     .with_paragraph(Ipv4Addr::new(127, 0, 0, 1))
 ///     .to_html_string();
 /// assert_eq!(content, "<div><p>127.0.0.1</p></div>")
@@ -27,7 +26,7 @@ use crate::{Container, Html, HtmlChild, HtmlElement, HtmlTag, Table};
 ///
 /// ```
 /// # use build_html::*;
-/// let content = Container::default()
+/// let content = HtmlElement::new(HtmlTag::Div)
 ///     .with_paragraph_attr("123", [("id", "paragraph"), ("class", "action")])
 ///     .to_html_string();
 /// assert_eq!(content, r#"<div><p id="paragraph" class="action">123</p></div>"#)
@@ -47,7 +46,7 @@ use crate::{Container, Html, HtmlChild, HtmlElement, HtmlTag, Table};
 ///     .fold(Container::new(ContainerType::OrderedList), |a, n| a.with_paragraph(n));
 ///
 /// // Defining content literally
-/// let content = Container::default()
+/// let content = HtmlElement::new(HtmlTag::Div)
 ///     .with_paragraph("paragraph text")
 ///     .with_container(list_items)
 ///     .to_html_string();
@@ -68,7 +67,7 @@ use crate::{Container, Html, HtmlChild, HtmlElement, HtmlTag, Table};
 ///
 /// ```
 /// # use build_html::*;
-/// let mut container = Container::default();
+/// let mut container = HtmlElement::new(HtmlTag::Div);
 /// if true {
 ///     container.add_paragraph("optional content");
 /// }
@@ -114,7 +113,7 @@ pub trait HtmlContainer: Html + Sized {
     ///     }
     /// }
     ///
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_html(Span::new("inner"));
     /// assert_eq!(content.to_html_string(), "<div><span>inner</span></div>");
     /// ```
@@ -149,7 +148,7 @@ pub trait HtmlContainer: Html + Sized {
     ///     }
     /// }
     ///
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_html(Span::new("inner"))
     ///     .to_html_string();
     /// assert_eq!(content, "<div><span>inner</span></div>");
@@ -161,11 +160,6 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Add the container to this HTML Container
-    ///
-    /// Under the covers, this is simply an alias for [`add_html`](HtmlContainer::add_html).
-    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply
-    /// that this function should be preferred because it is more descriptive. `add_html` is
-    /// intended to be more of an escape hatch than something used in everyday programs.
     ///
     /// # Example
     /// ```
@@ -180,11 +174,6 @@ pub trait HtmlContainer: Html + Sized {
     }
 
     /// Nest the specified container within this container
-    ///
-    /// Under the covers, this is simply an alias for [`with_html`](HtmlContainer::with_html).
-    /// Upon hearing this, you might be asking yourself "Why is this useful?". The answer is simply
-    /// that this function should be preferred because it is more descriptive. `with_html` is
-    /// intended to be more of an escape hatch than something used in everyday programs.
     ///
     /// # Example
     /// ```
@@ -216,7 +205,7 @@ pub trait HtmlContainer: Html + Sized {
     ///     [1, 2, 3],
     ///     [4, 5, 6]
     /// ]).with_header_row(['A', 'B', 'C']);
-    /// let mut container = Container::default();
+    /// let mut container = HtmlElement::new(HtmlTag::Div);
     /// container.add_table(table);
     ///
     /// assert_eq!(
@@ -240,7 +229,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_table(
     ///         Table::from(&[
     ///             [1, 2, 3],
@@ -271,7 +260,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_header(1, "Header Text");
     /// assert_eq!(content.to_html_string(), r#"<div><h1>Header Text</h1></div>"#);
     /// ```
@@ -284,7 +273,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_header(1, "Header Text")
     ///     .to_html_string();
     ///
@@ -299,7 +288,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_header_attr(1, "Header Text", std::iter::once(("id", "main-header")));
     /// assert_eq!(content.to_html_string(), r#"<div><h1 id="main-header">Header Text</h1></div>"#);
     /// ```
@@ -331,7 +320,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_header_attr(1, "Header Text", std::iter::once(("id", "main-header")))
     ///     .to_html_string();
     ///
@@ -351,7 +340,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_image("myimage.png", "a test image");
     /// assert_eq!(
     ///     content.to_html_string(),
@@ -367,7 +356,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_image("myimage.png", "a test image")
     ///     .to_html_string();
     ///
@@ -385,7 +374,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # use std::collections::BTreeMap;
     /// let mut attrs = BTreeMap::new();
     /// attrs.insert("id", "sample-image");
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_image_attr("myimage.png", "a test image", attrs);
     ///
     /// assert_eq!(
@@ -416,7 +405,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # use std::collections::BTreeMap;
     /// let mut attrs = BTreeMap::new();
     /// attrs.insert("id", "sample-image");
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_image_attr("myimage.png", "a test image", attrs)
     ///     .to_html_string();
     ///
@@ -439,7 +428,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_link("https://rust-lang.org/", "Rust Homepage");
     ///
     /// assert_eq!(
@@ -456,7 +445,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_link("https://rust-lang.org/", "Rust Homepage")
     ///     .to_html_string();
     ///
@@ -471,7 +460,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_link_attr("https://rust-lang.org/", "Rust Homepage", [("class", "links")]);
     ///
     /// assert_eq!(
@@ -498,7 +487,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_link_attr("https://rust-lang.org/", "Rust Homepage", [("class", "links")])
     ///     .to_html_string();
     ///
@@ -521,7 +510,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_paragraph("This is sample paragraph text");
     /// assert_eq!(content.to_html_string(), r#"<div><p>This is sample paragraph text</p></div>"#);
     /// ```
@@ -534,7 +523,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_paragraph("This is sample paragraph text")
     ///     .to_html_string();
     ///
@@ -549,7 +538,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_paragraph_attr("This is sample paragraph text", [("class", "text")]);
     /// assert_eq!(
     ///     content.to_html_string(),
@@ -574,7 +563,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_paragraph_attr("This is sample paragraph text", [("class", "text")])
     ///     .to_html_string();
     ///
@@ -594,7 +583,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_preformatted("This | is   preformatted => text");
     /// assert_eq!(
     ///     content.to_html_string(),
@@ -610,7 +599,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_preformatted("This | is   preformatted => text")
     ///     .to_html_string();
     ///
@@ -625,7 +614,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_preformatted_attr("This | is   preformatted => text", [("id", "code")]);
     /// assert_eq!(
     ///     content.to_html_string(),
@@ -650,7 +639,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_preformatted_attr("This | is   preformatted => text", [("id", "code")])
     ///     .to_html_string();
     ///
@@ -675,7 +664,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let mut content = Container::default();
+    /// let mut content = HtmlElement::new(HtmlTag::Div);
     /// content.add_raw(r#"<video width="250"><source src="video.mp4" type="video/mp4"></video>"#);
     /// assert_eq!(
     ///     content.to_html_string(),
@@ -696,7 +685,7 @@ pub trait HtmlContainer: Html + Sized {
     /// # Example
     /// ```
     /// # use build_html::*;
-    /// let content = Container::default()
+    /// let content = HtmlElement::new(HtmlTag::Div)
     ///     .with_raw(r#"<video width="250"><source src="video.mp4" type="video/mp4"></video>"#)
     ///     .to_html_string();
     ///

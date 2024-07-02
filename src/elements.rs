@@ -6,12 +6,30 @@ use std::fmt::{self, Display, Formatter};
 /// A child of an [`HtmlElement`]: either another element, or some raw text
 ///
 /// Generally, `HtmlContent` shouldn't need to be used directly. You can use `.into()` to convert
-/// strings and [`HtmlElement`]s into this type seamlessly.
+/// strings and [`HtmlElement`]s into this type. For example:
+/// 
+/// ```
+/// # use build_html::*;
+/// let html = HtmlElement::new(HtmlTag::Div)
+///     .with_child(
+///         HtmlElement::new(HtmlTag::ParagraphText)
+///             .with_child(
+///                 "raw text".into() // Convert this `&str` into an `HtmlChild::Raw`
+///             )
+///             .into() // Convert this `HtmlElement` into an `HtmlChild::Element`
+///     )
+///     .to_html_string();
+/// 
+/// assert_eq!(html, "<div><p>raw text</p></div>")
+/// ```
 #[derive(Debug, Clone)]
 pub enum HtmlChild {
     /// An element that can have more children of its own
     Element(HtmlElement),
+
     /// A raw string that will be appended into the output HTML
+    ///
+    /// This is an escape hatch you can use to inject any data into your HTML
     Raw(String),
 }
 
@@ -45,8 +63,12 @@ impl<S: AsRef<str>> From<S> for HtmlChild {
     }
 }
 
-/// A structured HTML element, with a tag, attributes, and children. This allows much greater
-/// flexibility than the traditional [`HtmlContainer`] interface.
+/// Basic Building Block: A structured HTML element, with a tag, attributes, and children.
+///
+/// This allows much greater flexibility than the traditional [`HtmlContainer`] interface. However,
+/// some users may still find the `HtmlContainer` interface more convienent than manually creating
+/// each individual element. You can use the [`HtmlContainer::add_raw`] and [`HtmlChild::Raw`]
+/// escape hatches to combine the two approaches by treating the "chunks" as strings.
 ///
 /// ```
 /// # use build_html::*;
