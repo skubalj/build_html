@@ -82,6 +82,8 @@ pub enum HtmlTag {
     PreformattedText,
     /// A generic section of the document
     Section,
+    /// A subsection of text
+    Span,
     /// A table element
     Table,
     /// The table body
@@ -153,6 +155,7 @@ impl HtmlTag {
             Self::ParagraphText => "p",
             Self::PreformattedText => "pre",
             Self::Section => "section",
+            Self::Span => "span",
             Self::Table => "table",
             Self::TableBody => "tbody",
             Self::TableCaption => "caption",
