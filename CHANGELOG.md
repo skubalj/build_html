@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.6.0 (2025-01-26)
+* Add support for `span` tags, courtesy of Alexandra Østermark (@cramt)
+
 ## Version 2.5.0 (2024-07-01)
 * Added `HtmlElement`, `HtmlTag`, and `HtmlChild` elements.
     * Shift underlying implementation to use these types, but retain compatibility with v2.
