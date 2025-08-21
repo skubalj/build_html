@@ -13,6 +13,8 @@ pub enum HtmlTag {
     Article,
     /// Indicates side content to the main content
     Aside,
+    /// Bold text
+    Bold,
     /// Indicates a blockquote
     Blockquote,
     /// HTML canvas element
@@ -23,6 +25,8 @@ pub enum HtmlTag {
     ///
     /// Generally, this causes it to be rendered in a monospace font, and to preserve whitespace
     CodeText,
+    /// Deleted text
+    Deleted,
     /// The outer wrapper for a description list
     ///
     /// A `dl` generally consists of alternating [`dt`](HtmlTag::DescriptionListTerm) and
@@ -34,6 +38,8 @@ pub enum HtmlTag {
     DescriptionListTerm,
     /// The almighty div -- a generic container with no predefined meaning
     Div,
+    /// Emphasized text
+    Emph,
     /// The caption for the contents of a figure
     Figcaption,
     /// A figure, such as an image
@@ -64,6 +70,10 @@ pub enum HtmlTag {
     Image,
     /// An inline quote
     InlineQuote,
+    // Inserted text
+    Inserted,
+    /// Italic text
+    Italic,
     /// A manual line break
     LineBreak,
     /// A link to another page or resource
@@ -72,6 +82,8 @@ pub enum HtmlTag {
     ListElement,
     /// A container for the main content on a page
     Main,
+    /// Marked text
+    Mark,
     /// A container for the navigation contenton a page
     Navigation,
     /// An unordered, generally numbered, list
@@ -82,8 +94,16 @@ pub enum HtmlTag {
     PreformattedText,
     /// A generic section of the document
     Section,
+    /// Small text
+    Small,
     /// A subsection of text
     Span,
+    /// Important text
+    Strong,
+    /// Subscript text
+    Subscript,
+    /// Superscript text
+    Superscript,
     /// A table element
     Table,
     /// The table body
@@ -124,13 +144,16 @@ impl HtmlTag {
             Self::Article => "article",
             Self::Aside => "aside",
             Self::Blockquote => "blockquote",
+            Self::Bold => "b",
             Self::Canvas => "canvas",
             Self::Cite => "cite",
             Self::CodeText => "code",
+            Self::Deleted => "del",
             Self::DescriptionList => "dl",
             Self::DescriptionListDescription => "dd",
             Self::DescriptionListTerm => "dt",
             Self::Div => "div",
+            Self::Emph => "em",
             Self::Figcaption => "figcaption",
             Self::Figure => "figure",
             Self::Footer => "footer",
@@ -146,16 +169,23 @@ impl HtmlTag {
             Self::Iframe => "iframe",
             Self::Image => "img",
             Self::InlineQuote => "q",
+            Self::Inserted => "ins",
+            Self::Italic => "i",
             Self::LineBreak => "br",
             Self::Link => "a",
             Self::ListElement => "li",
             Self::Main => "main",
+            Self::Mark => "mark",
             Self::Navigation => "nav",
             Self::OrderedList => "ol",
             Self::ParagraphText => "p",
             Self::PreformattedText => "pre",
             Self::Section => "section",
+            Self::Small => "small",
             Self::Span => "span",
+            Self::Strong => "strong",
+            Self::Subscript => "sub",
+            Self::Superscript => "sup",
             Self::Table => "table",
             Self::TableBody => "tbody",
             Self::TableCaption => "caption",
