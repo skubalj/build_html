@@ -39,7 +39,7 @@ pub enum HtmlTag {
     /// The almighty div -- a generic container with no predefined meaning
     Div,
     /// Emphasized text
-    Emph,
+    Emphasized,
     /// The caption for the contents of a figure
     Figcaption,
     /// A figure, such as an image
@@ -70,7 +70,7 @@ pub enum HtmlTag {
     Image,
     /// An inline quote
     InlineQuote,
-    // Inserted text
+    /// Inserted text
     Inserted,
     /// Italic text
     Italic,
@@ -153,7 +153,7 @@ impl HtmlTag {
             Self::DescriptionListDescription => "dd",
             Self::DescriptionListTerm => "dt",
             Self::Div => "div",
-            Self::Emph => "em",
+            Self::Emphasized => "em",
             Self::Figcaption => "figcaption",
             Self::Figure => "figure",
             Self::Footer => "footer",

@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.7.0 (2025-08-23)
+* Add support for formatting tags, courtesy of Bnyro (@Bnyro)
+
 ## Version 2.6.0 (2025-01-26)
 * Add support for `span` tags, courtesy of Alexandra Østermark (@cramt)
 

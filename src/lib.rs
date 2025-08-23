@@ -163,9 +163,9 @@ impl Html for &str {
 
 /// Escape the provided string.
 ///
-/// All HTML tags will be converted to their escaped versions. The output string should be safe to
-/// insert into an HTML document. Any embedded HTML tags will be rendered as text. It is important
-/// to *always* escape inputs from untrusted sources!
+/// All HTML special characters will be converted to their escaped versions. The output string
+/// should be safe to insert into an HTML document. Any embedded HTML tags will be rendered as
+/// text. It is important to *always* escape inputs from untrusted sources!
 ///
 /// Implementation note: The list of escaped characters is pulled from [Svelte](https://github.com/sveltejs/svelte/blob/master/src/compiler/compile/utils/stringify.ts#L14).
 ///
