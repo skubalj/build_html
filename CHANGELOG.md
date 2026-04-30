@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 2.8.0 (2026-04-29)
+* Added `FromStr` implementation for `HtmlTag`, courtesy of @PNys
+* Added HTMLTag for various tags (`meter`, `kbd`, `audio`, ...), including inputs
+  (`button`, `input`, `textarea`, and `label`)
+
 ## Version 2.7.0 (2025-08-23)
 * Add support for formatting tags, courtesy of Bnyro (@Bnyro)
 

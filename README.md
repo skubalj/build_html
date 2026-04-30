@@ -111,4 +111,4 @@ This project was made possible thanks to the following great projects:
 ## License
 This project is licensed under the [MIT license](https://mit-license.org).
 
-Copyright (C) 2020-2024 Joseph Skubal and Contributors
+Copyright (C) 2020-2026 Joseph Skubal and Contributors

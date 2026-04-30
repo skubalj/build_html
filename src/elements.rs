@@ -7,7 +7,7 @@ use std::fmt::{self, Display, Formatter};
 ///
 /// Generally, `HtmlContent` shouldn't need to be used directly. You can use `.into()` to convert
 /// strings and [`HtmlElement`]s into this type. For example:
-/// 
+///
 /// ```
 /// # use build_html::*;
 /// let html = HtmlElement::new(HtmlTag::Div)
@@ -19,7 +19,7 @@ use std::fmt::{self, Display, Formatter};
 ///             .into() // Convert this `HtmlElement` into an `HtmlChild::Element`
 ///     )
 ///     .to_html_string();
-/// 
+///
 /// assert_eq!(html, "<div><p>raw text</p></div>")
 /// ```
 #[derive(Debug, Clone)]

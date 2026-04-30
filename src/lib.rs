@@ -34,9 +34,15 @@
 //!             .with_child("Preformatted Text".into())
 //!             .into()
 //!     )
+//!     .with_child(
+//!         HtmlElement::new(HtmlTag::Button)
+//!             .with_attribute("id", "my-button")
+//!             .with_child("Button Text".into())
+//!             .into()
+//!     )
 //!     .to_html_string();
 //!
-//! assert_eq!(element, "<div><p>Paragraph Text</p><pre>Preformatted Text</pre></div>");
+//! assert_eq!(element, "<div><p>Paragraph Text</p><pre>Preformatted Text</pre><button id=\"my-button\">Button Text</button></div>");
 //!
 //! ```
 //!

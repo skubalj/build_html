@@ -22,64 +22,47 @@ macro_rules! def_tags {
         // original as_str impl
         impl $name {
             /// Get the tag code that this tag represents
-            fn as_str(&self) -> &'static str {
+            fn as_str(self) -> &'static str {
                 match self {
                     $(
                         Self::$variant => $str
                     ),*
                 }
             }
-
-            /// All available Tags as string
-            const fn expected() -> &'static [&'static str] {
-                &[ $( $str ),* ]
-            }
-        }
-
-        /// Invalid HtmlTag parsed from string
-        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        pub struct InvalidHtmlTag {
-            /// Invalid Tag
-            got: String,
-
-            /// The possible values
-            expected: &'static[&'static str],
-        }
-
-        impl InvalidHtmlTag {
-            /// Construct a new Error
-            pub fn new(got: impl Into<String>) -> Self {
-                Self {
-                    got: got.into(),
-                    expected: $name::expected(),
-                }
-            }
-        }
-
-        impl std::fmt::Display for InvalidHtmlTag {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(
-                    f,
-                    "Invalid {}: \"{}\", expected one of {:?}",
-                    stringify!($name),
-                    self.got,
-                    self.expected
-                )
-            }
         }
 
         // FromStr impl
         impl std::str::FromStr for $name {
-            type Err = InvalidHtmlTag;
-            fn from_str(s: &str) -> core::result::Result<Self, Self::Err> {
+            type Err = UnknownTagError;
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
                     $(
-                        $str => core::result::Result::Ok(Self::$variant),
+                        $str => Result::Ok(Self::$variant),
                     )*
-                    x => core::result::Result::Err(InvalidHtmlTag::new(x))
+                    x => Result::Err(UnknownTagError{got: x.into()})
                 }
             }
         }
+
+        /// Invalid HtmlTag parsed from string
+        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+        pub struct UnknownTagError {
+            /// Invalid Tag
+            got: String,
+        }
+
+        impl std::error::Error for UnknownTagError {}
+
+        impl std::fmt::Display for UnknownTagError {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(
+                    f,
+                    "unknown HTML element '{}'",
+                    self.got,
+                )
+            }
+        }
+
     };
 }
 
@@ -97,10 +80,14 @@ def_tags! {
         Article = "article",
         /// Indicates side content to the main content
         Aside = "aside",
+        /// Used to embed sound content in documents
+        Audio = "audio",
         /// Bold text
         Bold = "b",
         /// Indicates a blockquote
         Blockquote = "blockquote",
+        /// Button input element
+        Button = "button",
         /// HTML canvas element
         Canvas = "canvas",
         /// Used to mark the title of a cited work
@@ -111,6 +98,14 @@ def_tags! {
         CodeText = "code",
         /// Deleted text
         Deleted = "del",
+        /// Indicates a term to be defined
+        ///
+        /// The `<dfn>` element should be used in a complete definition statement, where the full
+        /// definition of the term can be one of the following:
+        /// * The ancestor paragraph (a block of text, sometimes marked by a <p> element)
+        /// * The <dt>/<dd> pairing
+        /// * The nearest section ancestor of the <dfn> element
+        Definition = "dfn",
         /// The outer wrapper for a description list
         ///
         /// A `dl` generally consists of alternating [`dt`](HtmlTag::DescriptionListTerm) and
@@ -154,10 +149,16 @@ def_tags! {
         Image = "img",
         /// An inline quote
         InlineQuote = "q",
+        /// Form controls
+        Input = "input",
         /// Inserted text
         Inserted = "ins",
         /// Italic text
         Italic = "i",
+        /// Represents a span of inline text denoting textual user input (eg:`<kbd>Ctrl</kbd>`)
+        Keyboard = "kbd",
+        /// A caption for an item in a user interface
+        Label = "label",
         /// A manual line break
         LineBreak = "br",
         /// A link to another page or resource
@@ -168,8 +169,12 @@ def_tags! {
         Main = "main",
         /// Marked text
         Mark = "mark",
+        /// A "meter bar" to display a value within a range
+        Meter = "meter",
         /// A container for the navigation contenton a page
         Navigation = "nav",
+        /// A placeholder for when scripting is unsupported by the browser
+        NoScript = "noscript",
         /// An unordered, generally numbered, list
         OrderedList = "ol",
         /// Paragraph text
@@ -208,6 +213,8 @@ def_tags! {
         TableHeaderCell = "th",
         /// A table row
         TableRow = "tr",
+        /// A text area
+        TextArea = "textarea",
         /// An unordered, generally bulleted, list
         UnorderedList = "ul",
         /// An embedded video element
@@ -233,8 +240,10 @@ mod tests {
         assert_eq!(HtmlTag::from_str("figcaption"), Ok(HtmlTag::Figcaption));
         assert_eq!(HtmlTag::from_str("h4"), Ok(HtmlTag::Heading4));
         assert_eq!(
-            HtmlTag::from_str("invalid tag"),
-            Err(InvalidHtmlTag::new("invalid tag"))
+            HtmlTag::from_str("unknown"),
+            Err(UnknownTagError {
+                got: "unknown".into()
+            })
         );
     }
 }
