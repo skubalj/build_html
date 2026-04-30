@@ -22,7 +22,7 @@ macro_rules! def_tags {
         // original as_str impl
         impl $name {
             /// Get the tag code that this tag represents
-            fn as_str(self) -> &'static str {
+            fn to_str(self) -> &'static str {
                 match self {
                     $(
                         Self::$variant => $str
@@ -224,7 +224,7 @@ def_tags! {
 
 impl Display for HtmlTag {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.as_str())
+        f.write_str(self.to_str())
     }
 }
 
