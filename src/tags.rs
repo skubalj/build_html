@@ -96,6 +96,8 @@ def_tags! {
         ///
         /// Generally, this causes it to be rendered in a monospace font, and to preserve whitespace
         CodeText = "code",
+        /// A set of recommended options for other controls, such as an [`Input`](HtmlTag::Input)
+        DataList = "datalist",
         /// Deleted text
         Deleted = "del",
         /// Indicates a term to be defined
@@ -119,12 +121,16 @@ def_tags! {
         Div = "div",
         /// Emphasized text
         Emphasized = "em",
+        /// A group of related controls and labels within a form
+        Fieldset = "fieldset",
         /// The caption for the contents of a figure
         Figcaption = "figcaption",
         /// A figure, such as an image
         Figure = "figure",
         /// A page footer
         Footer = "footer",
+        /// A document section containing interactive controls for submitting information
+        Form = "form",
         /// A page header, or introductory content
         Header = "header",
         /// A top level heading
@@ -159,6 +165,8 @@ def_tags! {
         Keyboard = "kbd",
         /// A caption for an item in a user interface
         Label = "label",
+        /// A caption for the content of a [`Fieldset`](HtmlTag::Fieldset)
+        Legend = "legend",
         /// A manual line break
         LineBreak = "br",
         /// A link to another page or resource
@@ -175,12 +183,22 @@ def_tags! {
         Navigation = "nav",
         /// A placeholder for when scripting is unsupported by the browser
         NoScript = "noscript",
+        /// A group of options within a [`Select`](HtmlTag::Select) menu
+        OptionGroup = "optgroup",
         /// An unordered, generally numbered, list
         OrderedList = "ol",
+        /// A container for the result of a calculation or user action
+        Output = "output",
         /// Paragraph text
         ParagraphText = "p",
         /// Preformatted text, typically rendered in monospace
         PreformattedText = "pre",
+        /// An indicator showing the completion progress of a task
+        Progress = "progress",
+        /// A control that provides a menu of options
+        Select = "select",
+        /// An item within a [`Select`](HtmlTag::Select), [`OptionGroup`](HtmlTag::OptionGroup), or [`DataList`](HtmlTag::DataList) (`option`)
+        SelectOption = "option",
         /// A generic section of the document
         Section = "section",
         /// Small text
