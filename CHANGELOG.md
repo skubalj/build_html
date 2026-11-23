@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## Version 2.9.0 (2026-11-22)
+* Added additional form elements to `HtmlTag`, courtesy of @Zodey-hub
+
 ## Version 2.8.0 (2026-04-29)
 * Added `FromStr` implementation for `HtmlTag`, courtesy of @PNys
 * Added HTMLTag for various tags (`meter`, `kbd`, `audio`, ...), including inputs
